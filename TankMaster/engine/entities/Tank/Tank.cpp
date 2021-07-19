@@ -1,12 +1,7 @@
 #include "Tank.h"
 
-Tank::Tank(Vec cords, Vec dir, double speed) : MovableObject(cords, dir, speed) {}
+Tank::Tank(Vec cords, Vec dir, float speed, size_t type) : MovableObject(cords, dir, speed, type) {}
 
-Vec Tank::get_cords() {
-	return cords;
+EntityType Tank::get_type() {
+	return EntityType(ENTITY_NAME::TANK, type_num);
 }
-
-double Tank::get_angl() {
-	return angl;
-}
-

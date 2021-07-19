@@ -1,21 +1,30 @@
 #include "movableobject.h"
 
-MovableObject::MovableObject(Vec cords, Vec dir, double speed) :
-	cords(cords), dir(dir), speed(speed), angl(0.0) {}
+MovableObject::MovableObject(Vec cords, Vec dir, float speed, size_t type_num) :
+	cords(cords), dir(dir), speed(speed), angl(0.0), type_num(type_num) {}
 
-void MovableObject::move_forward(double dist) {
+void MovableObject::move(float dist) {
 	cords += dist * dir;
 }
 
-void MovableObject::move_back(double dist) {
-	cords -= dist * dir;
-}
-
-void MovableObject::rotate(double add_angl) {
+void MovableObject::rotate(float add_angl) {
 	angl += add_angl;
 	rotate_vec(dir, add_angl);
 }
 
-double MovableObject::getSpeed() const {
+float MovableObject::getSpeed() const {
 	return speed;
 }
+
+Vec MovableObject::get_cords() {
+	return cords;
+}
+
+Vec MovableObject::get_dir() {
+	return dir;
+}
+
+float MovableObject::get_angl() {
+	return angl;
+}
+

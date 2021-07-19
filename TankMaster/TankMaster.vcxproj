@@ -20,6 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\entities\MovableObject\MovableObject.cpp" />
+    <ClCompile Include="engine\EntityType\EnityType.cpp" />
+    <ClCompile Include="engine\EntityType\EntityType.cpp" />
+    <ClCompile Include="engine\Game\Game.cpp" />
+    <ClCompile Include="gui\GameView\GameView.cpp" />
+    <ClCompile Include="main\sampleWall.cpp" />
     <ClCompile Include="Main\TankMaster.cpp" />
     <ClCompile Include="engine\entities\Tank\Tank.cpp" />
     <ClCompile Include="gui\TextureLoader\TextureLoader.cpp" />
@@ -28,6 +33,9 @@
   <ItemGroup>
     <ClInclude Include="engine\entities\MovableObject\MovableObject.h" />
     <ClInclude Include="engine\entities\Tank\Tank.h" />
+    <ClInclude Include="engine\EntityType\EnityType.h" />
+    <ClInclude Include="engine\Game\Game.h" />
+    <ClInclude Include="gui\GameView\GameView.h" />
     <ClInclude Include="gui\TextureLoader\TextureLoader.h" />
     <ClInclude Include="gui\constants.h" />
     <ClInclude Include="util\geometry_functions\geometry_functions.h" />

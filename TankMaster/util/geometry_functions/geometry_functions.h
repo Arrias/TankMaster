@@ -2,9 +2,9 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-using Vec = sf::Vector2<double>;
+using Vec = sf::Vector2f;
 
-const double PI = acos(-1);
-const double PI_ANGL = 180;
+const float PI = acos(-1.f);
+const float PI_ANGL = 180;
 
-void rotate_vec(Vec& vec, double angl);
+void rotate_vec(Vec& vec, float angl);

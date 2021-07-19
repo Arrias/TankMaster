@@ -3,10 +3,8 @@
 
 class Tank : public MovableObject {
 public:
-	Tank(Vec cords, Vec dir, double speed);
+	Tank(Vec cords, Vec dir, float speed, size_t type);
 
-	Vec get_cords();
-
-	double get_angl();
+	virtual EntityType get_type() override;
 };
 

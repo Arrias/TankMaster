@@ -1,32 +1,42 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include "../engine/entities/Tank/Tank.h"
+#include "../gui/GameView/GameView.h"
+#include "../engine/Game/Game.h"
 #include "../gui/constants.h"
 #include "../gui/TextureLoader/TextureLoader.h"
+#include <iostream>
 
 using namespace sf;
-
-TextureLoader txt;
-
-sf::Sprite paintTank(Tank& a) {
-	Sprite sprite(txt.load_texture(getPathToTexture("tank", 1)));
-
-	sprite.setOrigin(TANK_CONSTS::BASE::ORIGIN, TANK_CONSTS::BASE::ORIGIN);
-	sprite.setPosition(a.get_cords().x, a.get_cords().y);
-	sprite.setRotation(a.get_angl());
-	sprite.setScale(TANK_CONSTS::BASE::SCALE, TANK_CONSTS::BASE::SCALE);
-
-	return sprite;
-}
+using namespace std; // WTF DUDE?
 
 int main() {
 	RenderWindow window(VideoMode(WINDOW::WIDTH, WINDOW::HEIGHT), "TankMaster");
-	Tank tank = Tank(Vec(0, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED);
+
+	/*TextureLoader x;
+	x.load_texture("textures/tanks/1.png");
+
+	Game a;
+	a.addTank(Tank(Vec(0, 0), Vec(1, 0), TANK_CONSTS::BASE::SPEED, 1));
+
+	while (window.isOpen()) {
+		Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == Event::Closed) {
+				window.close();
+			}
+		}
+		draw_game(a, window);
+		window.display();
+	}*/
+
+	Game game;
+	game.addTank(Tank(Vec(0, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED, 1));
 
 	bool moveForward = false;
 	bool moveRight = false;
 	bool moveLeft = false;
 	bool moveBack = false;
+	
+	auto one_tank = game.get_tank(0);
 
 	while (window.isOpen()) {
 		Event event;
@@ -66,24 +76,22 @@ int main() {
 		}
 
 		if (moveBack) {
-			tank.move_back(tank.getSpeed());
+			one_tank->move(-one_tank->getSpeed());
 		}
 		if (moveForward) {
-			tank.move_forward(tank.getSpeed());
+			one_tank->move(one_tank->getSpeed());
 		}
 		if (moveLeft) {
-			tank.rotate(-TANK_CONSTS::BASE::ROTATION);
+			one_tank->rotate(-TANK_CONSTS::BASE::ROTATION);
 		}
 		if (moveRight) {
-			tank.rotate(TANK_CONSTS::BASE::ROTATION);
+			one_tank->rotate(TANK_CONSTS::BASE::ROTATION);
 		}
 
-		auto fig = paintTank(tank);
-		window.clear(Color(0, 0, 0, 0));
-		window.draw(fig);
+		window.clear(Color(0, 0, 0));
+		draw_game(game, window);
 		window.display();
 	}
-
 
 	return 0;
 }

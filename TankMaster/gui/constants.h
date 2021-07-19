@@ -1,29 +1,23 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include "../gui/constants.h"
 
 namespace WINDOW {
-	const double HEIGHT = 900;
-	const double WIDTH = 1500;
+	const size_t HEIGHT = 900;
+	const size_t WIDTH = 1500;
 }
 
 namespace TANK_CONSTS {
-	const double HEIGHT = 202;
-	const double WIDTH = 148;
-
 	namespace BASE {
-		const double SPEED = 0.5;
-		const double ROTATION = 0.1;
-		const double ORIGIN = 50.0;
-		const double SCALE = 0.6;
+		const float SPEED = 0.4;
+		const float ROTATION = 0.2;
+		const float SCALE = 0.5;
 	}
-}
 
-std::string getPathToTexture(std::string entity_type, int entity_num) {
-	std::stringstream ret;
-	ret << "textures\\";
-	ret << entity_type + "s\\";
-	ret << std::to_string(entity_num);
-	ret << ".png";
-	return ret.str();
+	const float PIC_HEIGHT = 202;
+	const float PIC_WIDTH = 148;
+
+	const float HEIGHT = PIC_HEIGHT * BASE::SCALE;
+	const float WIDTH = PIC_WIDTH * BASE::SCALE;
 }
