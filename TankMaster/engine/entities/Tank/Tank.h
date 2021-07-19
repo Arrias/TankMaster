@@ -5,6 +5,8 @@ class Tank : public MovableObject {
 public:
 	Tank(Vec cords, Vec dir, double speed);
 
-	sf::CircleShape paint();
+	Vec get_cords();
+
+	double get_angl();
 };
 

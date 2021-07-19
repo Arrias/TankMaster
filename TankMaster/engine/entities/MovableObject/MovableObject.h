@@ -12,6 +12,8 @@ public:
 	MovableObject(Vec cords, Vec dir, double speed);
 
 	void rotate(double add_angl);
-	void move_forward();
-	void move_back();
+	void move_forward(double dist);
+	void move_back(double dist);
+
+	double getSpeed() const;
 };

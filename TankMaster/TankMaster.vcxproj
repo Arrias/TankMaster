@@ -22,12 +22,20 @@
     <ClCompile Include="engine\entities\MovableObject\MovableObject.cpp" />
     <ClCompile Include="Main\TankMaster.cpp" />
     <ClCompile Include="engine\entities\Tank\Tank.cpp" />
+    <ClCompile Include="gui\TextureLoader\TextureLoader.cpp" />
     <ClCompile Include="util\geometry_functions\geometry_functions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\entities\MovableObject\MovableObject.h" />
     <ClInclude Include="engine\entities\Tank\Tank.h" />
+    <ClInclude Include="gui\TextureLoader\TextureLoader.h" />
+    <ClInclude Include="gui\constants.h" />
     <ClInclude Include="util\geometry_functions\geometry_functions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\samples\sample_tank.png" />
+    <Image Include="textures\tanks\1.png" />
+    <Image Include="textures\samples\tanks_5.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

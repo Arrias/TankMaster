@@ -1,4 +1,3 @@
-#pragma once
 #include "geometry_functions.h"
 
 void rotate_vec(Vec& vec, double angl) {
