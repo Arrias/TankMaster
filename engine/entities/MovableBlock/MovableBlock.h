@@ -9,14 +9,13 @@ protected:
 public:
 	MovableBlock(Block base, Vec dir, float speed);
 
-	void rotate(float add_angle);
 	void move(float dist);
 
-	float getSpeed() const;
+	float get_speed() const;
 
-	Vec get_cords();
 	Vec get_dir();
-	float get_angle();
 
 	EntityType get_type() override;
+
+	void rotate(float add_angle) override;
 };

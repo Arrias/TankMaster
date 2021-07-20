@@ -3,12 +3,12 @@
 #include "../entities/Tank/Tank.h"
 
 class Game {
-	std::vector<Tank> tanks;
+	std::vector<Block*> blocks;
 
 public:
-	void addTank(Tank a);
+	void addBlock(Block* a);
 
-	std::vector<MovableBlock*> get_objects();
+	std::vector<Block*> get_objects();
 
-	Tank* get_tank(int id);
+	Block* get_block(int id);
 };

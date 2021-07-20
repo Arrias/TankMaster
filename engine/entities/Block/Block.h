@@ -8,9 +8,18 @@ protected:
     Vec cords; // (!) coordinates of the center
     Vec size; // (width, height)
     int id;
-    size_t type_num; // num at textures
+    size_t type_num; // num at texture
+    float angle;
 public:
-    Block(Vec cords = Vec(), Vec size = Vec(), int id = 0, size_t type_num = 1);
+    Block(Vec cords = Vec(), Vec size = Vec(), int id = 0, size_t type_num = 1, float angle = 0);
+
+    virtual void rotate(float add_angle);
+
+    float get_angle() const;
+
+    Vec get_size();
+
+    Vec get_cords();
 
     virtual EntityType get_type();
 };

@@ -1,15 +1,13 @@
 #include "Game.h"
 
-void Game::addTank(Tank a) {
-	tanks.push_back(a);
+void Game::addBlock(Block *a) {
+	blocks.push_back(a);
 }
 
-std::vector<MovableBlock*> Game::get_objects() {
-	std::vector<MovableBlock*> ret;
-	for (auto& i : tanks) ret.push_back(&i);
-	return ret;
+std::vector<Block*> Game::get_objects() {
+    return blocks;
 }
 
-Tank* Game::get_tank(int id) {
-	return &tanks[id];
+Block* Game::get_block(int id)  {
+	return blocks[id];
 }

@@ -5,7 +5,7 @@
 
 namespace WINDOW {
 	const size_t HEIGHT = 900;
-	const size_t WIDTH = 1500;
+	const size_t WIDTH = 1600;
 }
 
 namespace TANK_CONSTS {

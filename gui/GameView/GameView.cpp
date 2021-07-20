@@ -20,19 +20,21 @@ void draw_floor(int floor_type, sf::RenderWindow &window) {
     }
 }
 
+void draw(Block *obj, sf::RenderWindow& window, sf::Texture * texture) {
+    sf::Sprite sprite(*texture, sf::IntRect(0, 0, obj->get_size().x, obj->get_size().y));
+    texture->setRepeated(true);
+    sprite.setOrigin(obj->get_size().x / 2, obj->get_size().y / 2);
+    sprite.setPosition(obj->get_cords().x, obj->get_cords().y);
+    sprite.setRotation(obj->get_angle());
+    window.draw(sprite);
+}
+
 void draw_game(Game &game, sf::RenderWindow &window) {
-    draw_floor(1, window);
+    draw_floor(2, window);
 
     auto objs = game.get_objects();
     for (auto obj : objs) {
-        auto texture = loader.load_texture(getPathToTexture(obj->get_type()));
-
-        if (obj->get_type().name == ENTITY_NAME::TANK) {
-            sf::Sprite sprite(*texture);
-            sprite.setOrigin(TANK_CONSTS::WIDTH / 2, TANK_CONSTS::HEIGHT / 2);
-            sprite.setPosition(obj->get_cords().x, obj->get_cords().y);
-            sprite.setRotation(obj->get_angle());
-            window.draw(sprite);
-        }
+        auto texture = loader.load_texture(obj->get_type());
+        draw(obj, window, texture);
     }
 }
