@@ -1,4 +1,4 @@
-#include "movableobject.h"
+#include "MovableObject.h"
 
 MovableObject::MovableObject(Vec cords, Vec dir, float speed, size_t type_num) :
 	cords(cords), dir(dir), speed(speed), angl(0.0), type_num(type_num) {}

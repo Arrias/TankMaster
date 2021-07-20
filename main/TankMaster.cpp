@@ -11,23 +11,6 @@ using namespace std; // WTF DUDE?
 int main() {
 	RenderWindow window(VideoMode(WINDOW::WIDTH, WINDOW::HEIGHT), "TankMaster");
 
-	/*TextureLoader x;
-	x.load_texture("textures/tanks/1.png");
-
-	Game a;
-	a.addTank(Tank(Vec(0, 0), Vec(1, 0), TANK_CONSTS::BASE::SPEED, 1));
-
-	while (window.isOpen()) {
-		Event event;
-		while (window.pollEvent(event)) {
-			if (event.type == Event::Closed) {
-				window.close();
-			}
-		}
-		draw_game(a, window);
-		window.display();
-	}*/
-
 	Game game;
 	game.addTank(Tank(Vec(0, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED, 1));
 
@@ -35,7 +18,7 @@ int main() {
 	bool moveRight = false;
 	bool moveLeft = false;
 	bool moveBack = false;
-	
+
 	auto one_tank = game.get_tank(0);
 
 	while (window.isOpen()) {

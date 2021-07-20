@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../../../util/geometry_functions/geometry_functions.h"
-#include "../../EntityType/EnityType.h"
+#include "../../EntityType/EntityType.h"
 
 class MovableObject {
 protected:

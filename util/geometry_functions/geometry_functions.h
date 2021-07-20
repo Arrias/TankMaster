@@ -4,7 +4,7 @@
 
 using Vec = sf::Vector2f;
 
-const float PI = acos(-1.f);
+const float PI = std::acos(-1.f);
 const float PI_ANGL = 180;
 
 void rotate_vec(Vec& vec, float angl);
