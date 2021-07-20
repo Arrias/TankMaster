@@ -12,7 +12,7 @@ int main() {
 	RenderWindow window(VideoMode(WINDOW::WIDTH, WINDOW::HEIGHT), "TankMaster");
 
 	Game game;
-	game.addTank(Tank(Vec(0, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED, 1));
+	game.addTank(Tank(MovableBlock( Block(Vec(0, 0), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 1, 1),  Vec(0, 1), TANK_CONSTS::BASE::SPEED), 100.0));
 
 	bool moveForward = false;
 	bool moveRight = false;

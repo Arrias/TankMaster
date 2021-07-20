@@ -9,8 +9,7 @@ sf::Texture* TextureLoader::load_texture(std::string texture_path) {
 	return loaded_textures[texture_path];
 }
 
-std::string getPathToTexture(MovableObject& obj) {
-	auto type = obj.get_type();
+std::string getPathToTexture(EntityType type) {
 	std::stringstream ret;
 	ret << "../";
 	ret << "textures/";

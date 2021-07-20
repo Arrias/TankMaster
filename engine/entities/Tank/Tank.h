@@ -1,9 +1,12 @@
 #pragma once
-#include "../MovableObject/MovableObject.h"
+#include "../MovableBlock/MovableBlock.h"
 
-class Tank : public MovableObject {
+class Tank : public MovableBlock {
+    float health;
 public:
-	Tank(Vec cords, Vec dir, float speed, size_t type);
+    Tank(MovableBlock base, float hp);
+
+    float get_health() const;
 
 	virtual EntityType get_type() override;
 };

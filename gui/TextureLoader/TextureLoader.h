@@ -2,7 +2,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <map>
-#include "../../engine/entities/MovableObject/MovableObject.h"
+#include "../../engine/entities/MovableBlock/MovableBlock.h"
 
 class TextureLoader {
 private:
@@ -11,4 +11,4 @@ public:
 	sf::Texture* load_texture(std::string texture_path);
 };
 
-std::string getPathToTexture(MovableObject& obj);
+std::string getPathToTexture(EntityType obj);

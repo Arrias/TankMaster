@@ -8,7 +8,7 @@ class Game {
 public:
 	void addTank(Tank a);
 
-	std::vector<MovableObject*> get_objects();
+	std::vector<MovableBlock*> get_objects();
 
 	Tank* get_tank(int id);
 };

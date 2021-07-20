@@ -3,8 +3,11 @@
 #include <string>
 
 enum class ENTITY_NAME {
+    BLOCK,
+    MOVABLE_BLOCK,
 	TANK,
 	WALL,
+	FLOOR
 };
 
 struct EntityType {
