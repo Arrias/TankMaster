@@ -15,31 +15,32 @@ int main() {
 
     Game game;
 
+    game.addBlock(new Block(Vec(500, 500), Vec(100, 100), 6, 1, 45));
     // Add one tank
-    game.addBlock(new Tank(
-            MovableBlock(Block(Vec(500, 500), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 1, 1), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
+    game.add_tank(new Tank(
+            MovableBlock(Block(Vec(500,300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 0, 1, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
             100.0));
 
     // Add borders
     game.addBlock(new Block(Vec(wall_thick / 2, (float) WINDOW::HEIGHT / 2), Vec(wall_thick, WINDOW::HEIGHT), 1, 1, 0));
     game.addBlock(
             new Block(Vec(WINDOW::WIDTH - wall_thick / 2, (float) WINDOW::HEIGHT / 2), Vec(wall_thick, WINDOW::HEIGHT),
-                      1, 1, 0));
+                      2, 1, 0));
 
-    game.addBlock(new Block(Vec((float) WINDOW::WIDTH / 2, wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick), 1, 1, 0));
+    game.addBlock(new Block(Vec((float) WINDOW::WIDTH / 2, wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick), 3, 1, 0));
     game.addBlock(
             new Block(Vec((float)WINDOW::WIDTH / 2, WINDOW::HEIGHT - wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick),
-                      1, 1, 0));
+                      4, 1, 0));
 
     // Add sample
-    game.addBlock(new Block(Vec(200, 200), Vec(50, 300), 1, 1, 35));
+    game.addBlock(new Block(Vec(200, 200), Vec(50, 300), 5, 1, 35));
 
     bool moveForward = false;
     bool moveRight = false;
     bool moveLeft = false;
     bool moveBack = false;
 
-    auto one_tank = game.get_block(0);
+    auto one_tank = game.get_tank(0);
 
     Block block(Vec(500, 500), Vec(500, 500));
 
@@ -81,10 +82,12 @@ int main() {
 
         Tank *tank = (Tank *) one_tank;
         if (moveBack) {
-            tank->move(-tank->get_speed());
+            //tank->move(-tank->get_speed());
+            game.move_tank(one_tank->get_id());
         }
         if (moveForward) {
-            tank->move(tank->get_speed());
+            //tank->move(tank->get_speed());
+            game.move_tank(one_tank->get_id());
         }
         if (moveLeft) {
             tank->rotate(-TANK_CONSTS::BASE::ROTATION);

@@ -21,5 +21,9 @@ public:
 
     Vec get_cords();
 
+    int get_id();
+
     virtual EntityType get_type();
 };
+
+bool check_blocks_intersection(Block* a, Block* b);
