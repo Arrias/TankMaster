@@ -1,8 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "../gui/GameView/GameView.h"
-#include "../engine/Game/Game.h"
 #include "../gui/constants.h"
-#include "../gui/TextureLoader/TextureLoader.h"
 #include <iostream>
 
 using namespace sf;
@@ -17,7 +15,7 @@ int main() {
 
     // Add one tank
     game.addBlock(new Tank(
-            MovableBlock(Block(Vec(500, 500), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 1, 1), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
+            MovableBlock(Block(Vec(500, 500), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 1, 3), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
             100.0));
 
     // Add borders
@@ -28,11 +26,14 @@ int main() {
 
     game.addBlock(new Block(Vec((float) WINDOW::WIDTH / 2, wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick), 1, 1, 0));
     game.addBlock(
-            new Block(Vec((float)WINDOW::WIDTH / 2, WINDOW::HEIGHT - wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick),
+            new Block(Vec((float) WINDOW::WIDTH / 2, WINDOW::HEIGHT - wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick),
                       1, 1, 0));
 
     // Add sample
     game.addBlock(new Block(Vec(200, 200), Vec(50, 300), 1, 1, 35));
+
+    // Add bullet
+    game.addBullet(new Bullet(MovableBlock(Block(Vec(60, 60), Vec(28, 28), 0, 1, 0), Vec(0, 1), 0.3), 5));
 
     bool moveForward = false;
     bool moveRight = false;
@@ -93,6 +94,7 @@ int main() {
             tank->rotate(TANK_CONSTS::BASE::ROTATION);
         }
 
+        game.move_bullets();
         window.clear(Color(0, 0, 0));
 
         draw_game(game, window);

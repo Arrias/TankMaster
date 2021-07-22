@@ -15,6 +15,7 @@ add_executable(TankMaster main/TankMaster.cpp
         gui/constants.h
         util/geometry_functions/geometry_functions.h util/geometry_functions/geometry_functions.cpp
         engine/entities/Block/Block.cpp engine/entities/Block/Block.h
+        engine/entities/Bullet/Bullet.cpp engine/entities/Bullet/Bullet.h
         )
 
 target_link_libraries(TankMaster sfml-graphics sfml-audio)

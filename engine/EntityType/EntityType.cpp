@@ -7,6 +7,7 @@ std::string EntityType::entity_name_to_string(ENTITY_NAME name) {
     if (name == ENTITY_NAME::TANK) return "tanks";
     if (name == ENTITY_NAME::WALL) return "walls";
     if (name == ENTITY_NAME::FLOOR) return "floors";
+    if (name == ENTITY_NAME::BULLET) return "bullets";
     // TODO
     assert(false);
 }

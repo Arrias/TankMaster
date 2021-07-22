@@ -7,7 +7,8 @@ enum class ENTITY_NAME {
     MOVABLE_BLOCK,
 	TANK,
 	WALL,
-	FLOOR
+	FLOOR,
+	BULLET
 };
 
 struct EntityType {

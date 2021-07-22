@@ -20,9 +20,10 @@ void draw_floor(int floor_type, sf::RenderWindow &window) {
     }
 }
 
-void draw(Block *obj, sf::RenderWindow& window, sf::Texture * texture) {
+void draw(Block *obj, sf::RenderWindow &window, sf::Texture *texture) {
     sf::Sprite sprite(*texture, sf::IntRect(0, 0, obj->get_size().x, obj->get_size().y));
     texture->setRepeated(true);
+    texture->setSmooth(true);
     sprite.setOrigin(obj->get_size().x / 2, obj->get_size().y / 2);
     sprite.setPosition(obj->get_cords().x, obj->get_cords().y);
     sprite.setRotation(obj->get_angle());
