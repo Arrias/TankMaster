@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "../entities/Tank/Tank.h"
-#include "/home/feggie/MyData/TankMaster/util/geometry_functions/geometry_functions.h"
+#include "../../util/geometry_functions/geometry_functions.h"
 
 class Game {
 	std::vector<Block*> blocks;
