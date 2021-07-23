@@ -67,3 +67,42 @@ Vec get_segments_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
     }
 }
 
+float get_vec_length(Vec vec) {
+    return std::sqrt(vec.x*vec.x+vec.y*vec.y);
+}
+
+float get_angle_between_vecs(Vec v1, Vec v2) {
+
+    float cos_val = (v1.x*v2.x+v1.y*v2.y)/ get_vec_length(v1)* get_vec_length(v2);
+    float angle = PI_ANGL*std::acos(cos_val)/PI;
+    if(is_greater(v1.x,0))
+        angle*=-1;
+    return angle;
+}
+
+Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
+    if(is_null(p2.x-p3.x)) {
+        if(is_greater(p1.x,p2.x))
+            return Vec(1,0);
+        else
+            return Vec(-1,0);
+    }
+    else {
+        float a1 = (p2.y - p3.y) / (p2.x - p3.x);
+        float b1 = p2.y - a1 * p3.x;
+        if(is_null(a1)) {
+            if(is_greater(p1.y,p2.y))
+                return Vec(0,1);
+            else
+                return Vec(0,-1);
+        }
+        else {
+            float a2 = -1.0 / a1;
+            float b2 = p1.y - a2 * p1.x;
+
+            float xi = (b2 - b1) / (a1 - a2);
+            float yi = a2 * xi + b2;
+            return (p1 - Vec(xi,yi));
+        }
+    }
+}

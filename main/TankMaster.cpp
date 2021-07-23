@@ -15,9 +15,6 @@ int main() {
 
     Game game;
 
-    //Vec p1=Vec(463,350),p2=Vec(463,250), p3=Vec(430,500), p4=Vec(500,430);
-    //get_segments_intersection(p1,p2,p3,p4);
-
     game.addBlock(new Block(Vec(500, 500), Vec(100, 100), 6, 1, 45));
     // Add one tank
     game.add_tank(new Tank(
