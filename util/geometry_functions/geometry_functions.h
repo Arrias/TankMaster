@@ -9,4 +9,4 @@ const float PI_ANGL = 180;
 const float eps = 1e-5;
 
 void rotate_vec(Vec& vec, float angl);
-Vec get_segments_intersection(Vec& p1, Vec& p2, Vec& p3, Vec& p4);
+Vec get_segments_intersection(Vec p1, Vec p2, Vec p3, Vec p4);

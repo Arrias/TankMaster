@@ -9,14 +9,14 @@ void rotate_vec(Vec& vec, float angl) {
 }
 
 bool is_null(float x) {
-    return (x < eps);
+    return (std::abs(x) < eps);
 }
 
 bool is_greater(float a, float b) {
     return ((a - b) > eps);
 }
 
-Vec get_segments_intersection(Vec& p1, Vec& p2, Vec& p3, Vec& p4) {
+Vec get_segments_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
     if(is_greater(p1.x,p2.x))
         std::swap(p1,p2);
     if(is_greater(p3.x,p4.x))
@@ -48,7 +48,7 @@ Vec get_segments_intersection(Vec& p1, Vec& p2, Vec& p3, Vec& p4) {
         float b2 = p3.y-a2*p3.x;
         float yi = a2*xi+b2;
         if(!is_greater(p3.x,xi) && !is_greater(xi,p4.x) &&
-            !is_greater(std::min(p3.y,p4.y),yi) && !is_greater(yi,std::max(p3.y,p4.y)))
+            !is_greater(std::min(p1.y,p2.y),yi) && !is_greater(yi,std::max(p1.y,p2.y)))
             return Vec(xi,yi);
         return Vec(-1000,-1000);
     }
@@ -65,8 +65,8 @@ Vec get_segments_intersection(Vec& p1, Vec& p2, Vec& p3, Vec& p4) {
         float xi = (b2-b1)/(a1-a2);
         float yi = a2*xi+b2;
         if(is_greater(std::max(p1.x,p3.x),xi) || is_greater(xi,std::min(p2.x,p4.x)))
-            return Vec(xi,yi);
-        return Vec(-1000,-1000);
+            return Vec(-1000,-1000);
+        return Vec(xi,yi);;
     }
 }
 
