@@ -20,10 +20,10 @@ Block *Game::get_block(int id) {
     assert(false);
 }
 
-void Game::move_tank(int id) {
+void Game::move_tank(int id, float dist) {
     MovableBlock *tank = get_tank(id);
 
-    tank->move(tank->get_speed());
+    tank->move(dist);
     bool is_bad_position = false;
     for (auto el : Game::blocks) {
         if (check_blocks_intersection(tank, el)) {
@@ -32,9 +32,24 @@ void Game::move_tank(int id) {
         }
     }
     if (is_bad_position) {
-        tank->move(-tank->get_speed());
+        tank->move(-dist);
     }
+}
 
+void Game::rotate_tank(int id, float add_angl) {
+    MovableBlock *tank = get_tank(id);
+
+    tank->rotate(add_angl);
+    bool is_bad_position = false;
+    for (auto el : Game::blocks) {
+        if (check_blocks_intersection(tank, el)) {
+            is_bad_position = true;
+            break;
+        }
+    }
+    if (is_bad_position) {
+        tank->rotate(-add_angl);
+    }
 }
 
 void Game::add_tank(MovableBlock *a) {

@@ -11,7 +11,8 @@ public:
 	void addBlock(Block* a);
     void add_tank(MovableBlock* a);
 
-    void move_tank(int id);
+    void move_tank(int id, float dist);
+    void rotate_tank(int id, float add_angl);
 	std::vector<Block*> get_objects();
 
 	Block* get_block(int id);

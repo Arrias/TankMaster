@@ -86,17 +86,19 @@ int main() {
         Tank *tank = (Tank *) one_tank;
         if (moveBack) {
             //tank->move(-tank->get_speed());
-            game.move_tank(one_tank->get_id());
+            game.move_tank(one_tank->get_id(), -one_tank->get_speed());
         }
         if (moveForward) {
             //tank->move(tank->get_speed());
-            game.move_tank(one_tank->get_id());
+            game.move_tank(one_tank->get_id(), one_tank->get_speed());
         }
         if (moveLeft) {
-            tank->rotate(-TANK_CONSTS::BASE::ROTATION);
+            //tank->rotate(-TANK_CONSTS::BASE::ROTATION);
+            game.rotate_tank(one_tank->get_id(), -TANK_CONSTS::BASE::ROTATION);
         }
         if (moveRight) {
-            tank->rotate(TANK_CONSTS::BASE::ROTATION);
+            //tank->rotate(TANK_CONSTS::BASE::ROTATION);
+            game.rotate_tank(one_tank->get_id(), TANK_CONSTS::BASE::ROTATION);
         }
 
         window.clear(Color(0, 0, 0));
