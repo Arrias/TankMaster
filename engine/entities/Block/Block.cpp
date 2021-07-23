@@ -1,4 +1,5 @@
 #include "Block.h"
+#include <iostream> // for debug
 
 Block::Block(Vec cords, Vec size, int id, size_t type_num, float angle) : cords(cords), size(size), id(id), type_num(type_num),
                                                                           angle(angle) {}
@@ -27,54 +28,47 @@ int Block::get_id() {
     return id;
 }
 
-bool check_blocks_intersection(Block* a, Block* b) {
-    Vec cords1 = a->get_cords();
-    Vec cords2 = b->get_cords();
+float dx[] = {-1, 1, 1, -1};
+float dy[] = {-1, -1, 1, 1};
 
-    std::vector<Vec> points1(4,Vec(0,0)),points2(4,Vec(0,0));
-    points1[0].x -= a->get_size().x/2;
-    points1[1].x -= a->get_size().x/2;
-    points1[2].x += a->get_size().x/2;
-    points1[3].x += a->get_size().x/2;
+bool check_blocks_intersection(Block *a, Block *b) {
+    Vec cords1 = a->cords;
+    Vec cords2 = b->cords;
 
-    points1[0].y += a->get_size().y/2;
-    points1[1].y -= a->get_size().y/2;
-    points1[2].y -= a->get_size().y/2;
-    points1[3].y += a->get_size().y/2;
+    std::vector<Vec> points1(4, Vec(0, 0)), points2(4, Vec(0, 0));
 
-    points2[0].x -= b->get_size().x/2;
-    points2[1].x -= b->get_size().x/2;
-    points2[2].x += b->get_size().x/2;
-    points2[3].x += b->get_size().x/2;
+    for (int i = 0; i < 4; ++i) {
+        points1[i] = {dx[i] * a->size.x / 2, dy[i] * a->size.y / 2};
+        points2[i] = {dx[i] * b->size.x / 2, dy[i] * b->size.y / 2};
+    }
 
-    points2[0].y += b->get_size().y/2;
-    points2[1].y -= b->get_size().y/2;
-    points2[2].y -= b->get_size().y/2;
-    points2[3].y += b->get_size().y/2;
-
-    for(auto &el : points1) {
+    std::cout << "first block" << std::endl;
+    for (auto &el : points1) {
         rotate_vec(el, a->get_angle());
-        el+=cords1;
+        el += cords1;
+        std::cout << el.x << " " << el.y << std::endl;
     }
-    for(auto &el : points2) {
+
+    std::cout << std::endl;
+    std::cout << "second block" << std::endl;
+    for (auto &el : points2) {
         rotate_vec(el, b->get_angle());
-        el+=cords2;
+        el += cords2;
+        std::cout << el.x << " " << el.y << std::endl;
     }
 
-    bool ret_value = false;
-    for(int i=0;i<4;++i) {
-        Vec p1 =  points1[i];
-        Vec p2 =  points1[(i+1)%4];
-        for(int j=0;j<4;++j) {
-            Vec p3 =  points2[j];
-            Vec p4 =  points2[(j+1)%4];
+    for (int i = 0; i < 4; ++i) {
+        Vec p1 = points1[i];
+        Vec p2 = points1[(i + 1) % 4];
+        for (int j = 0; j < 4; ++j) {
+            Vec p3 = points2[j];
+            Vec p4 = points2[(j + 1) % 4];
 
-            if(get_segments_intersection(p1,p2,p3,p4) != Vec(-1000,-1000)) {
-                ret_value = true;
-                goto skip;
+            if (get_segments_intersection(p1, p2, p3, p4) != Vec(-1000, -1000)) {
+                return true;
             }
         }
     }
-    skip:;
-    return ret_value;
+
+    return false;
 }

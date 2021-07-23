@@ -23,6 +23,8 @@ public:
 
     int get_id();
 
+    friend bool check_blocks_intersection(Block *a, Block *b);
+
     virtual EntityType get_type();
 };
 
