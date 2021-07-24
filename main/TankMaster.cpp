@@ -16,6 +16,7 @@ int main() {
     Game game;
 
     game.addBlock(new Block(Vec(500, 500), Vec(100, 100), 6, 1, 45));
+    game.addBlock(new Block(Vec(800, 800), Vec(300, 1000), 7, 1, 69));
     // Add one tank
     game.add_tank(new Tank(
             MovableBlock(Block(Vec(500,300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 0, 1, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),

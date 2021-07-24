@@ -89,7 +89,7 @@ Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
     }
     else {
         float a1 = (p2.y - p3.y) / (p2.x - p3.x);
-        float b1 = p2.y - a1 * p3.x;
+        float b1 = p2.y - a1 * p2.x;
         if(is_null(a1)) {
             if(is_greater(p1.y,p2.y))
                 return Vec(0,1);

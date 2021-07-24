@@ -93,6 +93,7 @@ std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b) {
     }
 
     std::vector<std::pair<Vec,Vec>> bad_segments;
+    std::bitset<4> used;
     for (int i = 0; i < 4; ++i) {
         Vec p1 = points1[i];
         Vec p2 = points1[(i + 1) % 4];
@@ -101,7 +102,10 @@ std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b) {
             Vec p4 = points2[(j + 1) % 4];
 
             if (get_segments_intersection(p1, p2, p3, p4) != Vec(-1000, -1000)) {
-                bad_segments.emplace_back(p3, p4);
+                if(!used[j]) {
+                    bad_segments.emplace_back(p3, p4);
+                    used[j]=1;
+                }
             }
         }
     }

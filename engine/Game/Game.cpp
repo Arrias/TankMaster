@@ -41,17 +41,24 @@ void Game::rotate_tank(int id, float add_angl) {
 
     tank->rotate(add_angl);
     bool is_bad_position=false;
+    bool more_than_one_bad_block=false;
     Vec sum_vec=Vec(0,0);
     for (auto block : Game::blocks) {
         if (get_blocks_intersection(tank, block)!=Vec(-1000,-1000)) {
+            if(is_bad_position){
+                more_than_one_bad_block=true;
+                break;
+            }
             auto bad_segments = get_bad_segments(tank,block);
             for(auto &bad_segment : bad_segments)
                 sum_vec += get_normal_vec(tank->get_cords(), bad_segment.first, bad_segment.second);
             is_bad_position=true;
-            break;
         }
     }
-    if (is_bad_position) {
+    if(more_than_one_bad_block) {
+        tank->rotate(-add_angl);
+    }
+    else if (is_bad_position) {
         float old_angle = tank->get_angle();
 
         sum_vec.y *= -1;

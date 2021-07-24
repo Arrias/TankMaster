@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "../../../util/geometry_functions/geometry_functions.h"
 #include "../../EntityType/EntityType.h"
+#include <bitset>
 
 class Block {
 protected:
