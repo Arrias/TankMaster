@@ -67,6 +67,44 @@ Vec get_segments_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
     }
 }
 
+Vec get_lines_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
+    if(is_greater(p1.x,p2.x))
+        std::swap(p1,p2);
+    if(is_greater(p3.x,p4.x))
+        std::swap(p3,p4);
+
+    if (is_null(p1.x - p2.x) && is_null(p3.x - p4.x)) {
+        if (is_null(p1.x - p3.x)) {
+            return p1;
+        }
+        return Vec(-1000, -1000);
+    } else if (is_null(p1.x - p2.x) || is_null(p3.x - p4.x)) {
+        if (!is_null(p1.x - p2.x)) {
+            std::swap(p1, p3);
+            std::swap(p2, p4);
+        }
+
+        float xi = p1.x;
+        float a2 = (p3.y-p4.y)/(p3.x-p4.x);
+        float b2 = p3.y-a2*p3.x;
+        float yi = a2*xi+b2;
+        return Vec(xi,yi);
+    }
+    else {
+        float a1 = (p1.y - p2.y) / (p1.x - p2.x);
+        float a2 = (p3.y - p4.y) / (p3.x - p4.x);
+        float b1 = p1.y - a1 * p1.x;
+        float b2 = p3.y - a2 * p3.x;
+
+        if (is_null(a1 - a2)) {
+            return Vec(-1000, -1000);
+        }
+        float xi = (b2-b1)/(a1-a2);
+        float yi = a2*xi+b2;
+        return Vec(xi,yi);
+    }
+}
+
 float get_vec_length(Vec vec) {
     return std::sqrt(vec.x*vec.x+vec.y*vec.y);
 }
@@ -80,21 +118,15 @@ float get_angle_between_vecs(Vec v1, Vec v2) {
     return angle;
 }
 
-Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
+Vec get_projection_on_line(Vec p1, Vec p2, Vec p3) {
     if(is_null(p2.x-p3.x)) {
-        if(is_greater(p1.x,p2.x))
-            return Vec(1,0);
-        else
-            return Vec(-1,0);
+        return Vec(p2.x, p1.y);
     }
     else {
         float a1 = (p2.y - p3.y) / (p2.x - p3.x);
         float b1 = p2.y - a1 * p2.x;
         if(is_null(a1)) {
-            if(is_greater(p1.y,p2.y))
-                return Vec(0,1);
-            else
-                return Vec(0,-1);
+            return Vec(p1.x, p2.y);
         }
         else {
             float a2 = -1.0 / a1;
@@ -102,7 +134,11 @@ Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
 
             float xi = (b2 - b1) / (a1 - a2);
             float yi = a2 * xi + b2;
-            return (p1 - Vec(xi,yi));
+            return Vec(xi,yi);
         }
     }
+}
+
+Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
+    return (p1-get_projection_on_line(p1,p2,p3));
 }

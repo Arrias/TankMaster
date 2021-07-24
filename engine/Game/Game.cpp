@@ -25,14 +25,49 @@ void Game::move_tank(int id, float dist) {
 
     tank->move(dist);
     bool is_bad_position = false;
-    for (auto el : Game::blocks) {
-        if (get_blocks_intersection(tank, el)!=Vec(-1000,-1000)) {
-            is_bad_position = true;
-            break;
+    bool more_than_one_bad_thing=false;
+    //std::pair<Vec,Vec> bad_segment;
+    Vec projection_on_line, indicating_point;
+    for (auto block : Game::blocks) {
+        if (get_blocks_intersection(tank, block)!=Vec(-1000,-1000)) {
+            if(is_bad_position) {
+                more_than_one_bad_thing = true;
+                break;
+            }
+
+            auto bad_segments = get_bad_segments(tank,block);
+            if(bad_segments.size()>1) {
+                is_bad_position = more_than_one_bad_thing = true;
+                break;
+            }
+
+            //bad_segment = *bad_segments.begin();
+            projection_on_line = get_projection_on_line(tank->get_cords(),bad_segments.begin()->first,bad_segments.begin()->second);
+            float agl_to_rad = tank->get_angle() * PI / PI_ANGL;
+            Vec dir = Vec(-std::sin(agl_to_rad),std::cos(agl_to_rad));
+            indicating_point = get_lines_intersection(tank->get_cords(),
+                                   tank->get_cords()+dir,
+                                   bad_segments.begin()->first,
+                                   bad_segments.begin()->second);
+            is_bad_position=true;
         }
     }
     if (is_bad_position) {
         tank->move(-dist);
+    }
+    if(!more_than_one_bad_thing){
+        float old_angle = tank->get_angle();
+
+        Vec fixe_vec = indicating_point-projection_on_line;
+        float deflection = std::min((float)0.5,std::sqrt(fixe_vec.x*fixe_vec.x+fixe_vec.y*fixe_vec.y)/tank->get_size().y);
+
+        if(!is_null(deflection)) {
+            fixe_vec.y *= -1;
+            float fixe_angle = get_angle_between_vecs(fixe_vec, Vec(0, -1));
+            tank->rotate(-old_angle + fixe_angle);
+            tank->move(std::abs(dist) * deflection);
+            tank->rotate(old_angle - fixe_angle);
+        }
     }
 }
 
@@ -42,7 +77,7 @@ void Game::rotate_tank(int id, float add_angl) {
     tank->rotate(add_angl);
     bool is_bad_position=false;
     bool more_than_one_bad_block=false;
-    Vec sum_vec=Vec(0,0);
+    Vec sum_normal_vec=Vec(0,0);
     for (auto block : Game::blocks) {
         if (get_blocks_intersection(tank, block)!=Vec(-1000,-1000)) {
             if(is_bad_position){
@@ -51,7 +86,7 @@ void Game::rotate_tank(int id, float add_angl) {
             }
             auto bad_segments = get_bad_segments(tank,block);
             for(auto &bad_segment : bad_segments)
-                sum_vec += get_normal_vec(tank->get_cords(), bad_segment.first, bad_segment.second);
+                sum_normal_vec += get_normal_vec(tank->get_cords(), bad_segment.first, bad_segment.second);
             is_bad_position=true;
         }
     }
@@ -61,8 +96,8 @@ void Game::rotate_tank(int id, float add_angl) {
     else if (is_bad_position) {
         float old_angle = tank->get_angle();
 
-        sum_vec.y *= -1;
-        float fixe_angle = get_angle_between_vecs(sum_vec,Vec(0,-1));
+        sum_normal_vec.y *= -1;
+        float fixe_angle = get_angle_between_vecs(sum_normal_vec,Vec(0,-1));
         tank->rotate(-old_angle+fixe_angle);
         tank->move(tank->get_speed());
         tank->rotate(old_angle-fixe_angle);
