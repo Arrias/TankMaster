@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "../../../util/geometry_functions/geometry_functions.h"
 #include "../../EntityType/EntityType.h"
+#include <bitset>
 
 class Block {
 protected:
@@ -23,9 +24,12 @@ public:
 
     int get_id();
 
-    friend bool check_blocks_intersection(Block *a, Block *b);
+    friend Vec get_blocks_intersection(Block *a, Block *b);
+
+    friend std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b);
 
     virtual EntityType get_type();
 };
 
-bool check_blocks_intersection(Block* a, Block* b);
+Vec get_blocks_intersection(Block* a, Block* b);
+std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b);
