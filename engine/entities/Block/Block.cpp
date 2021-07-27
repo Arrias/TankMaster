@@ -1,11 +1,13 @@
 #include "Block.h"
 #include <iostream> // for debug
+#include <iomanip>
+#include <set>
 
 Block::Block(Vec cords, Vec size, int id, size_t type_num, float angle) : cords(cords), size(size), id(id), type_num(type_num),
                                                                           angle(angle) {}
 
 EntityType Block::get_type() {
-    return EntityType(ENTITY_NAME::WALL, type_num);
+    return {ENTITY_NAME::WALL, type_num};
 }
 
 void Block::rotate(float add_angle) {
@@ -16,96 +18,81 @@ float Block::get_angle() const {
     return angle;
 }
 
-Vec Block::get_size() {
+Vec Block::get_size() const {
     return size;
 }
 
-Vec Block::get_cords() {
+Vec Block::get_cords() const {
     return cords;
 }
 
-int Block::get_id() {
+int Block::get_id() const {
     return id;
 }
 
-float dx[] = {-1, 1, 1, -1};
-float dy[] = {-1, -1, 1, 1};
-
-Vec get_blocks_intersection(Block *a, Block *b) {
-    Vec cords1 = a->cords;
-    Vec cords2 = b->cords;
-
-    std::vector<Vec> points1(4, Vec(0, 0)), points2(4, Vec(0, 0));
-
+std::vector<Vec> get_block_points(Block *block) {
+    float dx[] = {-1, 1, 1, -1};
+    float dy[] = {-1, -1, 1, 1};
+    std::vector<Vec> points(4);
     for (int i = 0; i < 4; ++i) {
-        points1[i] = {dx[i] * a->size.x / 2, dy[i] * a->size.y / 2};
-        points2[i] = {dx[i] * b->size.x / 2, dy[i] * b->size.y / 2};
+        points[i] = {dx[i] * block->size.x / 2, dy[i] * block->size.y / 2};
+        rotate_vec(points[i], block->get_angle());
+        points[i] += block->cords;
     }
-
-    std::cout << "first block" << std::endl;
-    for (auto &el : points1) {
-        rotate_vec(el, a->get_angle());
-        el += cords1;
-        std::cout << el.x << " " << el.y << std::endl;
-    }
-
-    std::cout << std::endl;
-    std::cout << "second block" << std::endl;
-    for (auto &el : points2) {
-        rotate_vec(el, b->get_angle());
-        el += cords2;
-        std::cout << el.x << " " << el.y << std::endl;
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        Vec p1 = points1[i];
-        Vec p2 = points1[(i + 1) % 4];
-        for (int j = 0; j < 4; ++j) {
-            Vec p3 = points2[j];
-            Vec p4 = points2[(j + 1) % 4];
-
-            Vec pnt = get_segments_intersection(p1, p2, p3, p4);
-            if (pnt != Vec(-1000, -1000)) {
-                return pnt;
-            }
-        }
-    }
-    return Vec(-1000, -1000);
+    return points;
 }
 
-std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b) {
-    Vec cords1 = a->cords;
-    Vec cords2 = b->cords;
+bool point_in_block(Vec point, Block *block) {
+    std::vector<Vec> points = get_block_points(block);
+    std::set<bool> order;
+    for (int i = 0; i < 4; ++i) {
+        int nxt = (i + 1) % 4;
+        Vec a = points[nxt] - points[i];
+        Vec b = point - points[i];
+        order.insert(is_greater(vec_prod(a, b), 0));
+    }
+    return (order.size() == 1);
+}
 
-    std::vector<Vec> points1(4, Vec(0, 0)), points2(4, Vec(0, 0));
+Intersection get_blocks_intersection(Block *a, Block *b) {
+    std::vector<Vec> points1 = get_block_points(a), points2 = get_block_points(b);
+    std::vector<Segment> segments1(4), segments2(4);
 
     for (int i = 0; i < 4; ++i) {
-        points1[i] = {dx[i] * a->size.x / 2, dy[i] * a->size.y / 2};
-        points2[i] = {dx[i] * b->size.x / 2, dy[i] * b->size.y / 2};
+        int nxt = (i + 1) % 4;
+        segments1[i] = { points1[i], points1[nxt] };
+        segments2[i] = { points2[i], points2[nxt] };
     }
-    for (auto &el : points1) {
-        rotate_vec(el, a->get_angle());
-        el += cords1;
-    }
-    for (auto &el : points2) {
-        rotate_vec(el, b->get_angle());
-        el += cords2;
-    }
-
-    std::vector<std::pair<Vec,Vec>> bad_segments;
-    std::bitset<4> used;
+    if(point_in_block(points1[0], b))
+        return {INTERSECTION_TYPE::ONE_INTERSECTION, points1[0]};
+    if(point_in_block(points2[0], a))
+        return {INTERSECTION_TYPE::ONE_INTERSECTION, points2[0]};
     for (int i = 0; i < 4; ++i) {
-        Vec p1 = points1[i];
-        Vec p2 = points1[(i + 1) % 4];
         for (int j = 0; j < 4; ++j) {
-            Vec p3 = points2[j];
-            Vec p4 = points2[(j + 1) % 4];
+            Intersection intersection = get_segments_intersection(segments1[i], segments2[j]);
+            if (intersection.type != INTERSECTION_TYPE::NO_INTERSECTIONS)
+                return intersection;
+        }
+    }
+    return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
+}
 
-            if (get_segments_intersection(p1, p2, p3, p4) != Vec(-1000, -1000)) {
-                if(!used[j]) {
-                    bad_segments.emplace_back(p3, p4);
-                    used[j]=1;
-                }
+std::vector<Segment> get_bad_segments(Block* a, Block* b) {
+    std::vector<Vec> points1 = get_block_points(a), points2 = get_block_points(b);
+    std::vector<Segment> segments1(4), segments2(4);
+
+    for (int i = 0; i < 4; ++i) {
+        int nxt = (i + 1) % 4;
+        segments1[i] = { points1[i], points1[nxt] };
+        segments2[i] = { points2[i], points2[nxt] };
+    }
+
+    std::vector<Segment> bad_segments;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (get_segments_intersection(segments1[j], segments2[i]).type != INTERSECTION_TYPE::NO_INTERSECTIONS) {
+                bad_segments.push_back(segments2[i]);
+                break;
             }
         }
     }
