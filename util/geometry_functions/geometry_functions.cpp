@@ -13,10 +13,12 @@ bool is_greater(float a, float b) {
     return ((a - b) > eps);
 }
 
+//градусы в радианы
 float deg_to_rad(float angle) {
     return angle * PI / PI_ANGLE;
 }
 
+//радианы в градусы
 float rad_to_deg(float angle) {
     return angle * PI_ANGLE / PI;
 }
@@ -28,24 +30,29 @@ Line::Line(Vec p1, Vec p2) {
     c = -a * p1.x -b * p1.y;
 }
 
+//возвращает вектор сонаправленный данной прямой
 Vec Line::get_dir_vec() const {
     return {-b, a};
 }
 
+//возвращает вектор перпендикулярный данной прямой
 Vec Line::get_norm_vec() const {
     return {a, b};
 }
 
+//возвращает какую-то точку, лежащую на данной прямой
 Vec Line::get_any_point() const {
     if(b == 0)
         return {-c / a, 0};
     return {0, -c / b};
 }
 
+//возвращает прямую, на которой лежит отрезок
 Line Segment::get_line() const {
     return {p1, p2};
 }
 
+//проверяет, что две прямые совпадают
 bool operator==(Line a, Line b) {
     float k = (is_null(a.a) ? b.b / a.b : b.a / a.a);
     if(!is_equal(a.a * k, b.a))
@@ -71,14 +78,17 @@ void rotate_vec(Vec &vec, float angle) {
     vec.y = x * std::sin(angle) + y * std::cos(angle);
 }
 
+//векторное произведение
 float vec_prod(Vec a, Vec b) {
     return a.x * b.y - a.y * b.x;
 }
 
+//скалярное произведение
 float scalar_prod(Vec a, Vec b) {
     return a.x * b.x + a.y * b.y;
 }
 
+//проверяет, что p лежит между a и b на числовой прямой
 bool is_into(float a, float b, float p) {
     return std::min(a, b) - eps <= p && p <= std::max(a, b) + eps;
 }
@@ -124,8 +134,7 @@ float get_vec_length(Vec vec) {
 }
 
 float get_angle_between(Vec v1, Vec v2) {
-    float a1 = polar(v1), a2 = polar(v2);
-    float res = a1 - a2;
+    float res = polar(v1) - polar(v2);
     if(res > PI)
         res -= 2 * PI;
     else if(res < -PI)

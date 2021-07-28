@@ -44,7 +44,6 @@ void Game::move_tank(int id, float dist) {
             projection_on_line = get_projection_on_line(tank->get_cords(), bad_segments.begin()->get_line());
             Vec dir = tank->get_dir();
             Intersection intersection = get_lines_intersection({tank->get_cords(), tank->get_cords() + dir}, bad_segments.begin()->get_line());
-            assert(intersection.type == INTERSECTION_TYPE::HAVE_INTERSECTIONS);
             indicating_point = intersection.point;
             is_bad_position = true;
         }

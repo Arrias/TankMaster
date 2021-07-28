@@ -1,7 +1,4 @@
 #include "Block.h"
-#include <iostream> // for debug
-#include <iomanip>
-#include <set>
 
 Block::Block(Vec cords, Vec size, int id, size_t type_num, float angle) : cords(cords), size(size), id(id), type_num(type_num),
                                                                           angle(angle) {}
@@ -30,6 +27,7 @@ int Block::get_id() const {
     return id;
 }
 
+//возвращает угловые точки блока
 std::vector<Vec> get_block_points(Block *block) {
     float dx[] = {-1, 1, 1, -1};
     float dy[] = {-1, -1, 1, 1};
@@ -39,19 +37,20 @@ std::vector<Vec> get_block_points(Block *block) {
         rotate_vec(points[i], block->get_angle());
         points[i] += block->cords;
     }
-    return points;
+    return points; //точки идут в порядке обхода против часовой стрелки
 }
 
+//проверяет, находится ли точка внутри блока
 bool point_in_block(Vec point, Block *block) {
     std::vector<Vec> points = get_block_points(block);
-    std::set<bool> order;
     for (int i = 0; i < 4; ++i) {
         int nxt = (i + 1) % 4;
         Vec a = points[nxt] - points[i];
         Vec b = point - points[i];
-        order.insert(is_greater(vec_prod(a, b), 0));
+        if(!is_greater(vec_prod(a, b), 0))
+            return false;
     }
-    return (order.size() == 1);
+    return true;
 }
 
 Intersection get_blocks_intersection(Block *a, Block *b) {
@@ -77,6 +76,7 @@ Intersection get_blocks_intersection(Block *a, Block *b) {
     return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
 }
 
+//возвращает все отрезки блока b, которые пересекаются с какими-то отрезками блока a
 std::vector<Segment> get_bad_segments(Block* a, Block* b) {
     std::vector<Vec> points1 = get_block_points(a), points2 = get_block_points(b);
     std::vector<Segment> segments1(4), segments2(4);
