@@ -1,144 +1,143 @@
 #include "geometry_functions.h"
-
-void rotate_vec(Vec &vec, float angl) {
-    float copy_x = vec.x;
-    float agl_to_rad = angl * PI / PI_ANGL;
-
-    vec.x = vec.x * cos(agl_to_rad) - vec.y * sin(agl_to_rad);
-    vec.y = copy_x * sin(agl_to_rad) + vec.y * cos(agl_to_rad);
-}
+#include <iostream>
 
 bool is_null(float x) {
     return (std::abs(x) < eps);
+}
+
+bool is_equal(float a, float b) {
+    return is_null(a - b);
 }
 
 bool is_greater(float a, float b) {
     return ((a - b) > eps);
 }
 
-Vec get_segments_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
-    if(is_greater(p1.x,p2.x))
-        std::swap(p1,p2);
-    if(is_greater(p3.x,p4.x))
-        std::swap(p3,p4);
-
-    if (is_greater(p3.x, p2.x))
-        return Vec(-1000, -1000);
-    else if (is_null(p1.x - p2.x) && is_null(p3.x - p4.x)) {
-        if (is_null(p1.x - p3.x)) {
-            if (!(is_greater(std::min(p3.y, p4.y), std::max(p1.y, p2.y)) ||
-                  is_greater(std::min(p1.y, p2.y), std::max(p3.y, p4.y)))) {
-                if (is_greater(std::min(p1.y, p2.y), std::min(p3.y, p4.y)))
-                    return Vec(p1.x, std::min(p1.y, p2.y));
-                else
-                    return Vec(p1.x, std::min(p3.y, p4.y));
-            }
-        }
-        return Vec(-1000, -1000);
-    } else if (is_null(p1.x - p2.x) || is_null(p3.x - p4.x)) {
-        if (!is_null(p1.x - p2.x)) {
-            std::swap(p1, p3);
-            std::swap(p2, p4);
-        }
-
-        float xi = p1.x;
-        float a2 = (p3.y-p4.y)/(p3.x-p4.x);
-        float b2 = p3.y-a2*p3.x;
-        float yi = a2*xi+b2;
-        if(!is_greater(p3.x,xi) && !is_greater(xi,p4.x) &&
-            !is_greater(std::min(p1.y,p2.y),yi) && !is_greater(yi,std::max(p1.y,p2.y)))
-            return Vec(xi,yi);
-        return Vec(-1000,-1000);
-    }
-    else {
-        float a1 = (p1.y - p2.y) / (p1.x - p2.x);
-        float a2 = (p3.y - p4.y) / (p3.x - p4.x);
-        float b1 = p1.y - a1 * p1.x;
-        float b2 = p3.y - a2 * p3.x;
-
-        if (is_null(a1 - a2)) {
-            return Vec(-1000, -1000);
-        }
-        float xi = (b2-b1)/(a1-a2);
-        float yi = a2*xi+b2;
-        if(is_greater(std::max(p1.x,p3.x),xi) || is_greater(xi,std::min(p2.x,p4.x)))
-            return Vec(-1000,-1000);
-        return Vec(xi,yi);
-    }
+float deg_to_rad(float angle) {
+    return angle * PI / PI_ANGLE;
 }
 
-Vec get_lines_intersection(Vec p1, Vec p2, Vec p3, Vec p4) {
-    if(is_greater(p1.x,p2.x))
-        std::swap(p1,p2);
-    if(is_greater(p3.x,p4.x))
-        std::swap(p3,p4);
+float rad_to_deg(float angle) {
+    return angle * PI_ANGLE / PI;
+}
 
-    if (is_null(p1.x - p2.x) && is_null(p3.x - p4.x)) {
-        if (is_null(p1.x - p3.x)) {
-            return p1;
-        }
-        return Vec(-1000, -1000);
-    } else if (is_null(p1.x - p2.x) || is_null(p3.x - p4.x)) {
-        if (!is_null(p1.x - p2.x)) {
-            std::swap(p1, p3);
-            std::swap(p2, p4);
-        }
+Line::Line(Vec p1, Vec p2) {
+    Vec v = p2 - p1;
+    a = -v.y;
+    b = v.x;
+    c = -a * p1.x -b * p1.y;
+}
 
-        float xi = p1.x;
-        float a2 = (p3.y-p4.y)/(p3.x-p4.x);
-        float b2 = p3.y-a2*p3.x;
-        float yi = a2*xi+b2;
-        return Vec(xi,yi);
+Vec Line::get_dir_vec() const {
+    return {-b, a};
+}
+
+Vec Line::get_norm_vec() const {
+    return {a, b};
+}
+
+Vec Line::get_any_point() const {
+    if(b == 0)
+        return {-c / a, 0};
+    return {0, -c / b};
+}
+
+Line Segment::get_line() const {
+    return {p1, p2};
+}
+
+bool operator==(Line a, Line b) {
+    float k = (is_null(a.a) ? b.b / a.b : b.a / a.a);
+    if(!is_equal(a.a * k, b.a))
+        return false;
+    if(!is_equal(a.b * k, b.b))
+        return false;
+    if(!is_equal(a.c * k, b.c))
+        return false;
+    return true;
+}
+
+float polar(Vec v) {
+    float res = atan2(v.y, v.x);
+    if(res < 0)
+        res += 2 * PI;
+    return res;
+}
+
+void rotate_vec(Vec &vec, float angle) {
+    float x = vec.x, y = vec.y;
+    angle = deg_to_rad(angle);
+    vec.x = x * std::cos(angle) - y * std::sin(angle);
+    vec.y = x * std::sin(angle) + y * std::cos(angle);
+}
+
+float vec_prod(Vec a, Vec b) {
+    return a.x * b.y - a.y * b.x;
+}
+
+float scalar_prod(Vec a, Vec b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+bool is_into(float a, float b, float p) {
+    return std::min(a, b) - eps <= p && p <= std::max(a, b) + eps;
+}
+
+Intersection get_segments_intersection(Segment s1, Segment s2) {
+    Vec p1 = s1.p1, p2 = s1.p2, p3 = s2.p1, p4 = s2.p2;
+
+    Vec v1 = p2 - p1, v2 = p4 - p3, v3 = p3 - p1;
+    if (is_null(vec_prod(v1, v2))) {
+        if(is_null(vec_prod(v1, v3))) {
+            if (is_into(p3.x, p4.x, p1.x) && is_into(p3.y, p4.y, p1.y))
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p1}; //infinity
+            if (is_into(p3.x, p4.x, p2.x) && is_into(p3.y, p4.y, p2.y))
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p2}; //infinity
+            if (is_into(p1.x, p2.x, p3.x) && is_into(p1.y, p2.y, p3.y))
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p3}; //infinity
+            if (is_into(p1.x, p2.x, p4.x) && is_into(p1.y, p2.y, p4.y))
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p4}; //infinity
+        }
+    } else {
+        Intersection intersection = get_lines_intersection({p1, p2}, {p3, p4});
+        if (is_into(p1.x, p2.x, intersection.point.x) &&
+            is_into(p3.x, p4.x, intersection.point.x) &&
+            is_into(p1.y, p2.y, intersection.point.y) &&
+            is_into(p3.y, p4.y, intersection.point.y))
+            return intersection;
     }
-    else {
-        float a1 = (p1.y - p2.y) / (p1.x - p2.x);
-        float a2 = (p3.y - p4.y) / (p3.x - p4.x);
-        float b1 = p1.y - a1 * p1.x;
-        float b2 = p3.y - a2 * p3.x;
+    return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
+}
 
-        if (is_null(a1 - a2)) {
-            return Vec(-1000, -1000);
-        }
-        float xi = (b2-b1)/(a1-a2);
-        float yi = a2*xi+b2;
-        return Vec(xi,yi);
-    }
+Intersection get_lines_intersection(Line l1, Line l2) {
+    if(l1 == l2)
+        return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, l1.get_any_point()}; //infinity
+    if(is_null(vec_prod(l1.get_dir_vec(), l2.get_dir_vec())))
+        return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
+    float x = (l2.b * l1.c - l1.b * l2.c) / (l1.b * l2.a - l2.b * l1.a);
+    float y = (l2.a * l1.c - l1.a * l2.c) / (l1.a * l2.b - l2.a * l1.b);
+    return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, {x, y}};
 }
 
 float get_vec_length(Vec vec) {
-    return std::sqrt(vec.x*vec.x+vec.y*vec.y);
+    return std::sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
-float get_angle_between_vecs(Vec v1, Vec v2) {
-
-    float cos_val = (v1.x*v2.x+v1.y*v2.y)/ get_vec_length(v1)* get_vec_length(v2);
-    float angle = PI_ANGL*std::acos(cos_val)/PI;
-    if(is_greater(v1.x,0))
-        angle*=-1;
-    return angle;
+float get_angle_between(Vec v1, Vec v2) {
+    float a1 = polar(v1), a2 = polar(v2);
+    float res = a1 - a2;
+    if(res > PI)
+        res -= 2 * PI;
+    else if(res < -PI)
+        res += 2 * PI;
+    return rad_to_deg(-res);
 }
 
-Vec get_projection_on_line(Vec p1, Vec p2, Vec p3) {
-    if(is_null(p2.x-p3.x)) {
-        return Vec(p2.x, p1.y);
-    }
-    else {
-        float a1 = (p2.y - p3.y) / (p2.x - p3.x);
-        float b1 = p2.y - a1 * p2.x;
-        if(is_null(a1)) {
-            return Vec(p1.x, p2.y);
-        }
-        else {
-            float a2 = -1.0 / a1;
-            float b2 = p1.y - a2 * p1.x;
-
-            float xi = (b2 - b1) / (a1 - a2);
-            float yi = a2 * xi + b2;
-            return Vec(xi,yi);
-        }
-    }
+Vec get_projection_on_line(Vec p, Line l) {
+    Line l1 = Line(p, p + l.get_norm_vec());
+    return get_lines_intersection(l, l1).point;
 }
 
-Vec get_normal_vec(Vec p1, Vec p2, Vec p3) {
-    return (p1-get_projection_on_line(p1,p2,p3));
+Vec get_normal_vec(Vec p1, Line l) {
+    return (p1 - get_projection_on_line(p1, l));
 }

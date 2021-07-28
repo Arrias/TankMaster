@@ -18,18 +18,21 @@ public:
 
     float get_angle() const;
 
-    Vec get_size();
+    Vec get_size() const;
 
-    Vec get_cords();
+    Vec get_cords() const;
 
-    int get_id();
+    int get_id() const;
 
-    friend Vec get_blocks_intersection(Block *a, Block *b);
+    friend std::vector<Vec> get_block_points(Block *a);
 
-    friend std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b);
+    friend Intersection get_blocks_intersection(Block *a, Block *b);
+
+    friend std::vector<Segment> get_bad_segments(Block* a, Block* b);
 
     virtual EntityType get_type();
 };
 
-Vec get_blocks_intersection(Block* a, Block* b);
-std::vector<std::pair<Vec,Vec>> get_bad_segments(Block* a, Block* b);
+std::vector<Vec> get_block_points(Block *a);
+Intersection get_blocks_intersection(Block* a, Block* b);
+std::vector<Segment> get_bad_segments(Block* a, Block* b);
