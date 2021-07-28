@@ -1,6 +1,5 @@
 #include "geometry_functions.h"
 #include <iostream>
-#include <cassert>
 
 bool is_null(float x) {
     return (std::abs(x) < eps);
@@ -49,11 +48,11 @@ Line Segment::get_line() const {
 
 bool operator==(Line a, Line b) {
     float k = (is_null(a.a) ? b.b / a.b : b.a / a.a);
-    if(is_equal(a.a * k, b.a))
+    if(!is_equal(a.a * k, b.a))
         return false;
-    if(is_equal(a.b * k, b.b))
+    if(!is_equal(a.b * k, b.b))
         return false;
-    if(is_equal(a.c * k, b.c))
+    if(!is_equal(a.c * k, b.c))
         return false;
     return true;
 }
@@ -91,13 +90,13 @@ Intersection get_segments_intersection(Segment s1, Segment s2) {
     if (is_null(vec_prod(v1, v2))) {
         if(is_null(vec_prod(v1, v3))) {
             if (is_into(p3.x, p4.x, p1.x) && is_into(p3.y, p4.y, p1.y))
-                return {INTERSECTION_TYPE::INF_INTERSECTIONS, p1}; //infinity
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p1}; //infinity
             if (is_into(p3.x, p4.x, p2.x) && is_into(p3.y, p4.y, p2.y))
-                return {INTERSECTION_TYPE::INF_INTERSECTIONS, p2}; //infinity
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p2}; //infinity
             if (is_into(p1.x, p2.x, p3.x) && is_into(p1.y, p2.y, p3.y))
-                return {INTERSECTION_TYPE::INF_INTERSECTIONS, p3}; //infinity
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p3}; //infinity
             if (is_into(p1.x, p2.x, p4.x) && is_into(p1.y, p2.y, p4.y))
-                return {INTERSECTION_TYPE::INF_INTERSECTIONS, p4}; //infinity
+                return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p4}; //infinity
         }
     } else {
         Intersection intersection = get_lines_intersection({p1, p2}, {p3, p4});
@@ -112,12 +111,12 @@ Intersection get_segments_intersection(Segment s1, Segment s2) {
 
 Intersection get_lines_intersection(Line l1, Line l2) {
     if(l1 == l2)
-        return {INTERSECTION_TYPE::INF_INTERSECTIONS, l1.get_any_point()}; //infinity
+        return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, l1.get_any_point()}; //infinity
     if(is_null(vec_prod(l1.get_dir_vec(), l2.get_dir_vec())))
         return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
     float x = (l2.b * l1.c - l1.b * l2.c) / (l1.b * l2.a - l2.b * l1.a);
     float y = (l2.a * l1.c - l1.a * l2.c) / (l1.a * l2.b - l2.a * l1.b);
-    return {INTERSECTION_TYPE::ONE_INTERSECTION, {x, y}};
+    return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, {x, y}};
 }
 
 float get_vec_length(Vec vec) {

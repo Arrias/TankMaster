@@ -64,13 +64,13 @@ Intersection get_blocks_intersection(Block *a, Block *b) {
         segments2[i] = { points2[i], points2[nxt] };
     }
     if(point_in_block(points1[0], b))
-        return {INTERSECTION_TYPE::ONE_INTERSECTION, points1[0]};
+        return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, points1[0]};
     if(point_in_block(points2[0], a))
-        return {INTERSECTION_TYPE::ONE_INTERSECTION, points2[0]};
+        return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, points2[0]};
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
             Intersection intersection = get_segments_intersection(segments1[i], segments2[j]);
-            if (intersection.type != INTERSECTION_TYPE::NO_INTERSECTIONS)
+            if (intersection.type == INTERSECTION_TYPE::HAVE_INTERSECTIONS)
                 return intersection;
         }
     }
@@ -90,7 +90,7 @@ std::vector<Segment> get_bad_segments(Block* a, Block* b) {
     std::vector<Segment> bad_segments;
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            if (get_segments_intersection(segments1[j], segments2[i]).type != INTERSECTION_TYPE::NO_INTERSECTIONS) {
+            if (get_segments_intersection(segments1[j], segments2[i]).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
                 bad_segments.push_back(segments2[i]);
                 break;
             }

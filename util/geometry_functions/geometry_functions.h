@@ -24,9 +24,8 @@ public:
 };
 
 enum class INTERSECTION_TYPE {
-    INF_INTERSECTIONS,
     NO_INTERSECTIONS,
-    ONE_INTERSECTION
+    HAVE_INTERSECTIONS
 };
 
 class Intersection {

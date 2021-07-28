@@ -26,10 +26,10 @@ void Game::move_tank(int id, float dist) {
     tank->move(dist);
     bool is_bad_position = false;
     bool more_than_one_bad_thing = false;
-    //std::pair<Vec,Vec> bad_segment;
+
     Vec projection_on_line, indicating_point;
     for (auto block : Game::blocks) {
-        if (get_blocks_intersection(tank, block).type != INTERSECTION_TYPE::NO_INTERSECTIONS) {
+        if (get_blocks_intersection(tank, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
             if(is_bad_position) {
                 more_than_one_bad_thing = true;
                 break;
@@ -41,12 +41,10 @@ void Game::move_tank(int id, float dist) {
                 break;
             }
 
-            //bad_segment = *bad_segments.begin();
             projection_on_line = get_projection_on_line(tank->get_cords(), bad_segments.begin()->get_line());
-            float angle = deg_to_rad(tank->get_angle());
-            Vec dir = {-std::sin(angle), std::cos(angle)};
+            Vec dir = tank->get_dir();
             Intersection intersection = get_lines_intersection({tank->get_cords(), tank->get_cords() + dir}, bad_segments.begin()->get_line());
-            assert(intersection.type != INTERSECTION_TYPE::NO_INTERSECTIONS);
+            assert(intersection.type == INTERSECTION_TYPE::HAVE_INTERSECTIONS);
             indicating_point = intersection.point;
             is_bad_position = true;
         }
@@ -78,7 +76,7 @@ void Game::rotate_tank(int id, float add_angle) {
 
     Vec sum_normal_vec = {0,0};
     for (auto block : Game::blocks) {
-        if (get_blocks_intersection(tank, block).type != INTERSECTION_TYPE::NO_INTERSECTIONS) {
+        if (get_blocks_intersection(tank, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
             if(is_bad_position) {
                 tank->rotate(-add_angle);
                 return; //more_than_one
