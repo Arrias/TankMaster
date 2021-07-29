@@ -84,7 +84,7 @@ void Game::rotate_tank(int id, float add_angle) {
     if (!crashed) {
         tank->rotate(add_angle);
     } else {
-        safe_move(id, TANK_CONSTS::BASE::ROTATION, add_dir);
+        safe_move(id, TANK_CONSTS::BASE::SPEED, add_dir);
         safe_rotate(id, add_angle / 2);
     }
 }
