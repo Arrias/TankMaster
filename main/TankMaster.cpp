@@ -9,6 +9,76 @@ using namespace std; // WTF DUDE?
 
 const float wall_thick = 50;
 
+// For test
+struct TankController {
+    Tank *tank;
+    Game *game;
+    sf::Keyboard::Key left, right, up, down;
+    std::chrono::time_point<std::chrono::high_resolution_clock> t1;
+
+    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down) : tank(tank),
+                                                                                                                            game(game),
+                                                                                                                            left(left),
+                                                                                                                            right(right),
+                                                                                                                            up(up),
+                                                                                                                            down(down),
+                                                                                                                            t1(std::chrono::high_resolution_clock::now()) {}
+
+    bool moveUp = false;
+    bool moveLeft = false;
+    bool moveDown = false;
+    bool moveRight = false;
+
+    void update(Event &e) {
+        if (e.type == Event::KeyPressed) {
+            if (e.key.code == up) {
+                moveUp = true;
+            }
+            if (e.key.code == down) {
+                moveDown = true;
+            }
+            if (e.key.code == right) {
+                moveRight = true;
+            }
+            if (e.key.code == left) {
+                moveLeft = true;
+            }
+        } else if (e.type == Event::KeyReleased) {
+            if (e.key.code == up) {
+                moveUp = false;
+            }
+            if (e.key.code == down) {
+                moveDown = false;
+            }
+            if (e.key.code == right) {
+                moveRight = false;
+            }
+            if (e.key.code == left) {
+                moveLeft = false;
+            }
+        }
+    }
+
+    void move() {
+        auto cur = std::chrono::high_resolution_clock::now();
+        auto lambda = (cur - t1).count() / 1e6;
+        t1 = cur;
+
+        if (moveDown) {
+            game->move_tank(tank->get_id(), lambda * -tank->get_speed(), tank->get_dir());
+        }
+        if (moveUp) {
+            game->move_tank(tank->get_id(), lambda * tank->get_speed(), tank->get_dir());
+        }
+        if (moveLeft) {
+            game->rotate_tank(tank->get_id(), lambda * -TANK_CONSTS::BASE::ROTATION);
+        }
+        if (moveRight) {
+            game->rotate_tank(tank->get_id(), lambda * TANK_CONSTS::BASE::ROTATION);
+        }
+    }
+};
+
 int main() {
     RenderWindow window(VideoMode(WINDOW::WIDTH, WINDOW::HEIGHT), "TankMaster");
 
@@ -16,10 +86,19 @@ int main() {
 
     game.addBlock(new Block(Vec(500, 500), Vec(100, 100), 6, 1, 45));
     game.addBlock(new Block(Vec(800, 800), Vec(300, 1000), 7, 1, 69));
-    // Add one tank
+
+    // Add tanks
     game.add_tank(new Tank(
             MovableBlock(Block(Vec(500, 300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 0, 3, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
             100.0));
+
+    TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down);
+
+    game.add_tank(new Tank(
+            MovableBlock(Block(Vec(800, 300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 1, 2, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
+            100.0));
+
+    TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S);
 
     // Add borders
     game.addBlock(new Block(Vec(wall_thick / 2, (float) WINDOW::HEIGHT / 2), Vec(wall_thick, WINDOW::HEIGHT), 1, 1, 0));
@@ -35,72 +114,20 @@ int main() {
     // Add sample
     game.addBlock(new Block(Vec(200, 200), Vec(50, 300), 5, 1, 35));
 
-    bool moveForward = false;
-    bool moveRight = false;
-    bool moveLeft = false;
-    bool moveBack = false;
-
-    auto one_tank = game.get_tank(0);
-
-    Block block(Vec(500, 500), Vec(500, 500));
-
-    auto t1 = std::chrono::high_resolution_clock::now();
-
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) {
                 window.close();
             }
-
-            if (event.type == Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Right) {
-                    moveRight = true;
-                }
-                if (event.key.code == sf::Keyboard::Left) {
-                    moveLeft = true;
-                }
-                if (event.key.code == sf::Keyboard::Up) {
-                    moveForward = true;
-                }
-                if (event.key.code == sf::Keyboard::Down) {
-                    moveBack = true;
-                }
-            } else if (event.type == Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::Right) {
-                    moveRight = false;
-                }
-                if (event.key.code == sf::Keyboard::Left) {
-                    moveLeft = false;
-                }
-                if (event.key.code == sf::Keyboard::Up) {
-                    moveForward = false;
-                }
-                if (event.key.code == sf::Keyboard::Down) {
-                    moveBack = false;
-                }
-            }
+            t1.update(event);
+            t2.update(event);
         }
 
-        auto t2 = std::chrono::high_resolution_clock::now();
-        auto lambda = (t2 - t1).count() / 1e6;
-
-        t1 = t2;
-        if (moveBack) {
-            game.move_tank(one_tank->get_id(), lambda * -one_tank->get_speed(), one_tank->get_dir());
-        }
-        if (moveForward) {
-            game.move_tank(one_tank->get_id(), lambda * one_tank->get_speed(), one_tank->get_dir());
-        }
-        if (moveLeft) {
-            game.rotate_tank(one_tank->get_id(), lambda * -TANK_CONSTS::BASE::ROTATION);
-        }
-        if (moveRight) {
-            game.rotate_tank(one_tank->get_id(), lambda * TANK_CONSTS::BASE::ROTATION);
-        }
+        t1.move();
+        t2.move();
 
         window.clear(Color(0, 0, 0));
-
         draw_game(game, window);
         window.display();
     }

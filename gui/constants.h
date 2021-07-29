@@ -14,6 +14,6 @@ namespace TANK_CONSTS {
 		const float ROTATION = 0.3;
 	}
 
-	const float HEIGHT = 101;
-	const float WIDTH = 74;
+	const float HEIGHT = 82;
+	const float WIDTH = 60;
 }

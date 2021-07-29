@@ -39,7 +39,7 @@ void Game::move_tank(int id, float dist, Vec dir) {
     float add_angle = 0;
     bool crashed = false;
 
-    for (auto block : Game::blocks) {
+    auto update = [&add_angle, &crashed, &tank](Block *block) {
         if (get_blocks_intersection(tank, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
             crashed = true;
 
@@ -52,6 +52,16 @@ void Game::move_tank(int id, float dist, Vec dir) {
             }
 
             add_angle += sign * TANK_CONSTS::BASE::ROTATION;
+        }
+    };
+
+    for (auto block : Game::blocks) {
+        update(block);
+    }
+
+    for (auto other_tank : Game::tanks) {
+        if (other_tank->get_id() != tank->get_id()) {
+            update(other_tank);
         }
     }
 
@@ -71,13 +81,23 @@ void Game::rotate_tank(int id, float add_angle) {
     Vec add_dir(0, 0);
     bool crashed = false;
 
-    for (auto block : Game::blocks) {
+    auto update = [&crashed, &copy, &add_dir, &tank] (Block *block) {
         if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
             crashed = true;
 
             auto bad_segment = get_bad_segments(&copy, block)[0];
             Vec perp = normalize(get_normal_vec(tank->get_cords(), Line(bad_segment.p1, bad_segment.p2)));
             add_dir += perp;
+        }
+    };
+
+    for (auto block : Game::blocks) {
+        update(block);
+    }
+
+    for (auto other_tank : Game::tanks) {
+        if (other_tank->get_id() != tank->get_id()) {
+            update(other_tank);
         }
     }
 

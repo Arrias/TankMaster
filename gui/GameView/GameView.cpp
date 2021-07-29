@@ -31,7 +31,7 @@ void draw(Block *obj, sf::RenderWindow &window, sf::Texture *texture) {
 }
 
 void draw_game(Game &game, sf::RenderWindow &window) {
-    //draw_floor(2, window);
+    draw_floor(3, window);
 
     auto objs = game.get_objects();
     for (auto obj : objs) {
