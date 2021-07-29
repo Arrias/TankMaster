@@ -1,21 +1,22 @@
 #pragma once
+
 #include "../Block/Block.h"
 
 class MovableBlock : public Block {
 protected:
-	float speed;
-	float angle;
-	Vec dir;
+    float speed;
+    float angle;
+    Vec dir;
 public:
-	MovableBlock(Block base, Vec dir, float speed);
+    MovableBlock(Block base, Vec dir, float speed);
 
-	void move(float dist);
+    void move(float dist, Vec moveDir);
 
-	float get_speed() const;
+    float get_speed() const;
 
-	Vec get_dir();
+    Vec get_dir();
 
-	EntityType get_type() override;
+    EntityType get_type() override;
 
-	void rotate(float add_angle) override;
+    void rotate(float add_angle) override;
 };

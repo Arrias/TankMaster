@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include "../../../util/geometry_functions/geometry_functions.h"
 #include "../../EntityType/EntityType.h"
@@ -28,11 +29,13 @@ public:
 
     friend Intersection get_blocks_intersection(Block *a, Block *b);
 
-    friend std::vector<Segment> get_bad_segments(Block* a, Block* b);
+    friend std::vector<Segment> get_bad_segments(Block *a, Block *b);
 
     virtual EntityType get_type();
 };
 
 std::vector<Vec> get_block_points(Block *a);
-Intersection get_blocks_intersection(Block* a, Block* b);
-std::vector<Segment> get_bad_segments(Block* a, Block* b);
+
+Intersection get_blocks_intersection(Block *a, Block *b);
+
+std::vector<Segment> get_bad_segments(Block *a, Block *b);

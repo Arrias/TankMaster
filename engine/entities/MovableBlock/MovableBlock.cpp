@@ -1,15 +1,15 @@
 #include "MovableBlock.h"
 
-void MovableBlock::move(float dist) {
-	cords += dist * dir;
+void MovableBlock::move(float dist, Vec moveDir) {
+    cords += dist * moveDir;
 }
 
 float MovableBlock::get_speed() const {
-	return speed;
+    return speed;
 }
 
 Vec MovableBlock::get_dir() {
-	return dir;
+    return dir;
 }
 
 MovableBlock::MovableBlock(Block base, Vec dir, float speed) : Block(base), dir(dir), speed(speed) {}

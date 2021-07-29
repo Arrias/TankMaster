@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <cassert>
+#include "../../gui/constants.h"
 #include <iostream>
 
 void Game::addBlock(Block *a) {
@@ -26,86 +27,65 @@ void Game::addBullet(Bullet *a) {
 }
 
 void Game::move_bullets() {
-    for (auto el : bullets) {
-        el->move(el->get_speed());
-        // TODO check if bullet hit the target
-    }
+
 }
 
+const int ITER = 10; // bp iterations count
 
-void Game::move_tank(int id, float dist) {
+void Game::move_tank(int id, float dist, Vec dir) {
     MovableBlock *tank = get_tank(id);
-    tank->move(dist);
-    bool is_bad_position = false;
-    bool more_than_one_bad_thing = false;
+    tank->move(dist, dir);
 
-    Vec projection_on_line, indicating_point;
+    float add_angle = 0;
+    bool crashed = false;
+
     for (auto block : Game::blocks) {
         if (get_blocks_intersection(tank, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
-            if(is_bad_position) {
-                more_than_one_bad_thing = true;
-                break;
+            crashed = true;
+
+            auto bad_seg = get_bad_segments(tank, block)[0];
+            float angle = get_angle_between(bad_seg.p2 - bad_seg.p1, tank->get_dir());
+            float sign = 1;
+
+            if ((0 <= angle && angle < 90) || (angle < -90)) {
+                sign *= -1;
             }
 
-            auto bad_segments = get_bad_segments(tank, block);
-            if(bad_segments.size() > 1) {
-                is_bad_position = more_than_one_bad_thing = true;
-                break;
-            }
-
-            projection_on_line = get_projection_on_line(tank->get_cords(), bad_segments.begin()->get_line());
-            Vec dir = tank->get_dir();
-            Intersection intersection = get_lines_intersection({tank->get_cords(), tank->get_cords() + dir}, bad_segments.begin()->get_line());
-            assert(intersection.type == INTERSECTION_TYPE::HAVE_INTERSECTIONS);
-            indicating_point = intersection.point;
-            is_bad_position = true;
+            add_angle += sign * TANK_CONSTS::BASE::ROTATION;
         }
     }
-    if (is_bad_position) {
-        tank->move(-dist);
-    }
-    if (!more_than_one_bad_thing) {
-        float old_angle = tank->get_angle();
 
-        Vec fixe_vec = indicating_point - projection_on_line;
-        float deflection = std::min((float) 0.5, std::sqrt(fixe_vec.x * fixe_vec.x + fixe_vec.y * fixe_vec.y) / tank->get_size().y);
-
-        if (!is_null(deflection)) {
-            fixe_vec.y *= -1;
-            float fixe_angle = get_angle_between(fixe_vec, Vec(0, -1));
-            tank->rotate(-old_angle + fixe_angle);
-            tank->move(std::abs(dist) * deflection);
-            tank->rotate(old_angle - fixe_angle);
-        }
+    if (crashed) {
+        tank->move(-dist, dir);
+        safe_move(id, -dist / 4, dir);
+        safe_rotate(id, 2 * add_angle);
+        // Эти константы я подогнал (так лучше смотрится по ощущениям), тут должно быть что-то физическое
     }
 }
 
 void Game::rotate_tank(int id, float add_angle) {
     MovableBlock *tank = get_tank(id);
+    auto copy(*tank);
+    copy.rotate(add_angle);
 
-    tank->rotate(add_angle);
-    bool is_bad_position = false;
+    Vec add_dir(0, 0);
+    bool crashed = false;
 
-    Vec sum_normal_vec = {0,0};
     for (auto block : Game::blocks) {
-        if (get_blocks_intersection(tank, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
-            if(is_bad_position) {
-                tank->rotate(-add_angle);
-                return; //more_than_one
-            }
-            auto bad_segments = get_bad_segments(tank, block);
-            for(auto &bad_segment : bad_segments)
-                sum_normal_vec += get_normal_vec(tank->get_cords(), bad_segment.get_line());
-            is_bad_position = true;
+        if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
+            crashed = true;
+
+            auto bad_segment = get_bad_segments(&copy, block)[0];
+            Vec perp = normalize(get_normal_vec(tank->get_cords(), Line(bad_segment.p1, bad_segment.p2)));
+            add_dir += perp;
         }
     }
-    if (is_bad_position) {
-        float old_angle = tank->get_angle();
-        sum_normal_vec.y *= -1;
-        float angle = get_angle_between(sum_normal_vec,Vec(0,-1));
-        tank->rotate(-old_angle + angle);
-        tank->move(tank->get_speed());
-        tank->rotate(old_angle - angle);
+
+    if (!crashed) {
+        tank->rotate(add_angle);
+    } else {
+        safe_move(id, TANK_CONSTS::BASE::ROTATION, add_dir);
+        safe_rotate(id, add_angle / 2);
     }
 }
 
@@ -119,4 +99,54 @@ MovableBlock *Game::get_tank(int id) {
             return el;
     }
     assert(false);
+}
+
+void Game::safe_move(int id, float dist, Vec dir) {
+    MovableBlock *tank = get_tank(id);
+
+    float safe = dist;
+    for (auto block : Game::blocks) {
+        float lo = 0, hi = safe;
+
+        for (int iter = 0; iter < ITER; ++iter) {
+            float mid = (lo + hi) / 2;
+            auto copy(*tank);
+            copy.move(mid, dir);
+            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+            copy.move(-mid, dir);
+        }
+
+        safe = lo;
+    }
+
+    tank->move(safe, dir);
+}
+
+void Game::safe_rotate(int id, float add_angle) {
+    MovableBlock *tank = get_tank(id);
+
+    float safe = add_angle;
+
+    for (auto block : Game::blocks) {
+        float lo = 0, hi = safe;
+
+        for (int iter = 0; iter < ITER; ++iter) {
+            float mid = (lo + hi) / 2;
+            auto copy(*tank);
+            copy.rotate(mid);
+            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+
+        safe = lo;
+    }
+
+    tank->rotate(safe);
 }

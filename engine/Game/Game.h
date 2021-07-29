@@ -8,6 +8,9 @@ class Game {
     std::vector<MovableBlock*> tanks;
 	std::vector<Bullet*> bullets;
 
+	void safe_move(int id, float dist, Vec dir);
+	void safe_rotate(int id, float add_angle);
+
 public:
 	void addBlock(Block* a);
     void add_tank(MovableBlock* a);
@@ -16,8 +19,8 @@ public:
 
 	void move_bullets();
 
-    void move_tank(int id, float dist);
-    void rotate_tank(int id, float add_angl);
+    void move_tank(int id, float dist, Vec dir);
+    void rotate_tank(int id, float add_angle);
 	std::vector<Block*> get_objects();
 
 	Block* get_block(int id);

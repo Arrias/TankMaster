@@ -10,8 +10,8 @@ namespace WINDOW {
 
 namespace TANK_CONSTS {
 	namespace BASE {
-		const float SPEED = 0.4;
-		const float ROTATION = 0.2;
+		const float SPEED = 0.3;
+		const float ROTATION = 0.3;
 	}
 
 	const float HEIGHT = 101;

@@ -25,7 +25,7 @@ Line::Line(Vec p1, Vec p2) {
     Vec v = p2 - p1;
     a = -v.y;
     b = v.x;
-    c = -a * p1.x -b * p1.y;
+    c = -a * p1.x - b * p1.y;
 }
 
 Vec Line::get_dir_vec() const {
@@ -37,7 +37,7 @@ Vec Line::get_norm_vec() const {
 }
 
 Vec Line::get_any_point() const {
-    if(b == 0)
+    if (b == 0)
         return {-c / a, 0};
     return {0, -c / b};
 }
@@ -48,18 +48,22 @@ Line Segment::get_line() const {
 
 bool operator==(Line a, Line b) {
     float k = (is_null(a.a) ? b.b / a.b : b.a / a.a);
-    if(!is_equal(a.a * k, b.a))
+    if (!is_equal(a.a * k, b.a))
         return false;
-    if(!is_equal(a.b * k, b.b))
+    if (!is_equal(a.b * k, b.b))
         return false;
-    if(!is_equal(a.c * k, b.c))
+    if (!is_equal(a.c * k, b.c))
         return false;
     return true;
 }
 
+bool operator==(Segment a, Segment b) {
+    return a.p1 == b.p1 && a.p2 == b.p2;
+}
+
 float polar(Vec v) {
     float res = atan2(v.y, v.x);
-    if(res < 0)
+    if (res < 0)
         res += 2 * PI;
     return res;
 }
@@ -88,7 +92,7 @@ Intersection get_segments_intersection(Segment s1, Segment s2) {
 
     Vec v1 = p2 - p1, v2 = p4 - p3, v3 = p3 - p1;
     if (is_null(vec_prod(v1, v2))) {
-        if(is_null(vec_prod(v1, v3))) {
+        if (is_null(vec_prod(v1, v3))) {
             if (is_into(p3.x, p4.x, p1.x) && is_into(p3.y, p4.y, p1.y))
                 return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, p1}; //infinity
             if (is_into(p3.x, p4.x, p2.x) && is_into(p3.y, p4.y, p2.y))
@@ -110,9 +114,9 @@ Intersection get_segments_intersection(Segment s1, Segment s2) {
 }
 
 Intersection get_lines_intersection(Line l1, Line l2) {
-    if(l1 == l2)
+    if (l1 == l2)
         return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, l1.get_any_point()}; //infinity
-    if(is_null(vec_prod(l1.get_dir_vec(), l2.get_dir_vec())))
+    if (is_null(vec_prod(l1.get_dir_vec(), l2.get_dir_vec())))
         return {INTERSECTION_TYPE::NO_INTERSECTIONS, {0, 0}};
     float x = (l2.b * l1.c - l1.b * l2.c) / (l1.b * l2.a - l2.b * l1.a);
     float y = (l2.a * l1.c - l1.a * l2.c) / (l1.a * l2.b - l2.a * l1.b);
@@ -123,12 +127,19 @@ float get_vec_length(Vec vec) {
     return std::sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
+Vec normalize(Vec p1) {
+    float len = get_vec_length(p1);
+    p1.x /= len;
+    p1.y /= len;
+    return p1;
+}
+
 float get_angle_between(Vec v1, Vec v2) {
     float a1 = polar(v1), a2 = polar(v2);
     float res = a1 - a2;
-    if(res > PI)
+    if (res > PI)
         res -= 2 * PI;
-    else if(res < -PI)
+    else if (res < -PI)
         res += 2 * PI;
     return rad_to_deg(-res);
 }
