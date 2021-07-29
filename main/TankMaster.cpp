@@ -1,9 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "../gui/GameView/GameView.h"
-#include "../engine/Game/Game.h"
 #include "../gui/constants.h"
-#include "../gui/TextureLoader/TextureLoader.h"
 #include <iostream>
+#include <chrono>
 
 using namespace sf;
 using namespace std; // WTF DUDE?
@@ -19,7 +18,7 @@ int main() {
     game.addBlock(new Block(Vec(800, 800), Vec(300, 1000), 7, 1, 69));
     // Add one tank
     game.add_tank(new Tank(
-            MovableBlock(Block(Vec(500,300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 0, 1, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
+            MovableBlock(Block(Vec(500, 300), Vec(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), 0, 3, 0), Vec(0, 1), TANK_CONSTS::BASE::SPEED),
             100.0));
 
     // Add borders
@@ -30,7 +29,7 @@ int main() {
 
     game.addBlock(new Block(Vec((float) WINDOW::WIDTH / 2, wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick), 3, 1, 0));
     game.addBlock(
-            new Block(Vec((float)WINDOW::WIDTH / 2, WINDOW::HEIGHT - wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick),
+            new Block(Vec((float) WINDOW::WIDTH / 2, WINDOW::HEIGHT - wall_thick / 2), Vec(WINDOW::WIDTH, wall_thick),
                       4, 1, 0));
 
     // Add sample
@@ -48,6 +47,8 @@ int main() {
     auto one_tank = game.get_tank(0);
 
     Block block(Vec(500, 500), Vec(500, 500));
+
+    auto t1 = std::chrono::high_resolution_clock::now();
 
     while (window.isOpen()) {
         Event event;
@@ -95,22 +96,21 @@ int main() {
             }
         }
 
-        Tank *tank = (Tank *) one_tank;
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto lambda = (t2 - t1).count() / 1e6;
+
+        t1 = t2;
         if (moveBack) {
-            //tank->move(-tank->get_speed());
-            game.move_tank(one_tank->get_id(), -one_tank->get_speed());
+            game.move_tank(one_tank->get_id(), lambda * -one_tank->get_speed(), one_tank->get_dir());
         }
         if (moveForward) {
-            //tank->move(tank->get_speed());
-            game.move_tank(one_tank->get_id(), one_tank->get_speed());
+            game.move_tank(one_tank->get_id(), lambda * one_tank->get_speed(), one_tank->get_dir());
         }
         if (moveLeft) {
-            //tank->rotate(-TANK_CONSTS::BASE::ROTATION);
-            game.rotate_tank(one_tank->get_id(), -TANK_CONSTS::BASE::ROTATION);
+            game.rotate_tank(one_tank->get_id(), lambda * -TANK_CONSTS::BASE::ROTATION);
         }
         if (moveRight) {
-            //tank->rotate(TANK_CONSTS::BASE::ROTATION);
-            game.rotate_tank(one_tank->get_id(), TANK_CONSTS::BASE::ROTATION);
+            game.rotate_tank(one_tank->get_id(), lambda * TANK_CONSTS::BASE::ROTATION);
         }
         //
         if (SHOOT) {
