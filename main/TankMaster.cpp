@@ -41,6 +41,10 @@ int main() {
     bool moveLeft = false;
     bool moveBack = false;
 
+    //
+    bool SHOOT = false;
+    //
+
     auto one_tank = game.get_tank(0);
 
     Block block(Vec(500, 500), Vec(500, 500));
@@ -53,6 +57,11 @@ int main() {
             }
 
             if (event.type == Event::KeyPressed) {
+                //
+                if (event.key.code == sf::Keyboard::G) {
+                    SHOOT = true;
+                }
+                //
                 if (event.key.code == sf::Keyboard::Right) {
                     moveRight = true;
                 }
@@ -66,6 +75,11 @@ int main() {
                     moveBack = true;
                 }
             } else if (event.type == Event::KeyReleased) {
+                //
+                if (event.key.code == sf::Keyboard::G) {
+                    SHOOT = false;
+                }
+                //
                 if (event.key.code == sf::Keyboard::Right) {
                     moveRight = false;
                 }
@@ -98,6 +112,15 @@ int main() {
             //tank->rotate(TANK_CONSTS::BASE::ROTATION);
             game.rotate_tank(one_tank->get_id(), TANK_CONSTS::BASE::ROTATION);
         }
+        //
+        if (SHOOT) {
+            game.shoot(one_tank->get_id());
+        }
+        //
+
+        //
+        game.move_all_bullets();
+        //
 
         window.clear(Color(0, 0, 0));
 

@@ -10,6 +10,8 @@ std::vector<Block *> Game::get_objects() {
     std::vector<Block *> ret = blocks;
     for (auto el : tanks)
         ret.push_back(el);
+    for (auto el : bullets)
+        ret.push_back(el);
     return ret;
 }
 
@@ -96,11 +98,41 @@ void Game::rotate_tank(int id, float add_angle) {
     }
 }
 
-void Game::add_tank(MovableBlock *a) {
+void Game::shoot(int id) {
+    Tank *tank = get_tank(id);
+    if(tank->get_ammunition()>0) {
+        bullets.push_back(new MovableBlock(Block(tank->get_cords(),Vec(10,10),229,1,tank->get_angle()),
+                                       tank->get_dir(),
+                                       0.2));
+        tank->add_ammunition(-1);
+    }
+}
+
+void Game::move_all_bullets() {
+    std::vector<MovableBlock*> good_bullets;
+    for(auto bullet : bullets) {
+        bullet->move(0.2);
+        bool is_bad_position = false;
+
+        Vec projection_on_line, indicating_point;
+        for (auto block : Game::blocks) {
+            if (get_blocks_intersection(bullet, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
+                is_bad_position=true;
+                break;
+            }
+        }
+        if (!is_bad_position) {
+            good_bullets.push_back(bullet);
+        }
+    }
+    bullets = good_bullets;
+}
+
+void Game::add_tank(Tank *a) {
     tanks.push_back(a);
 }
 
-MovableBlock *Game::get_tank(int id) {
+Tank *Game::get_tank(int id) {
     for (auto el : Game::tanks) {
         if (el->get_id() == id)
             return el;
