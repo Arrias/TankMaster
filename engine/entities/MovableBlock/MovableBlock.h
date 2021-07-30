@@ -6,17 +6,18 @@ class MovableBlock : public Block {
 protected:
     float speed;
     float angle;
-    Vec dir;
+    float angle_speed;
+    Vector dir;
 public:
-    MovableBlock(Block base, Vec dir, float speed);
+    MovableBlock(Block base, Vector dir, float speed, float angle_speed);
 
-    void move(float dist, Vec moveDir);
+    void move(float dist, Vector moveDir);
 
     float get_speed() const;
 
-    Vec get_dir();
+    float get_angle_speed() const;
 
-    EntityType get_type() override;
+    Vector get_dir();
 
     void rotate(float add_angle) override;
 };

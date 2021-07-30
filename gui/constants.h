@@ -17,3 +17,12 @@ namespace TANK_CONSTS {
 	const float HEIGHT = 82;
 	const float WIDTH = 60;
 }
+
+namespace BULLET_CONSTS {
+    namespace BASE {
+        const float SPEED = 0.3;
+    }
+
+    const float HEIGHT = 14;
+    const float WIDTH = 14;
+}

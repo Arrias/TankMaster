@@ -1,17 +1,9 @@
 #include "Game.h"
 #include <cassert>
-#include "../../gui/constants.h"
 #include <iostream>
 
-void Game::addBlock(Block *a) {
+void Game::add_block(Block *a) {
     blocks.push_back(a);
-}
-
-std::vector<Block *> Game::get_objects() {
-    std::vector<Block *> ret = blocks;
-    for (auto el : tanks)
-        ret.push_back(el);
-    return ret;
 }
 
 Block *Game::get_block(int id) {
@@ -22,17 +14,19 @@ Block *Game::get_block(int id) {
     assert(false);
 }
 
-void Game::addBullet(Bullet *a) {
+void Game::add_bullet(Bullet *a) {
     bullets.push_back(a);
 }
 
-void Game::move_bullets() {
-
+void Game::move_bullets(float lambda) {
+    for (auto el : bullets) {
+        el->move(el->get_speed() * lambda, el->get_dir());
+    }
 }
 
 const int ITER = 10; // bp iterations count
 
-void Game::move_tank(int id, float dist, Vec dir) {
+void Game::move_tank(int id, float dist, Vector dir) {
     MovableBlock *tank = get_tank(id);
     tank->move(dist, dir);
 
@@ -44,14 +38,14 @@ void Game::move_tank(int id, float dist, Vec dir) {
             crashed = true;
 
             auto bad_seg = get_bad_segments(tank, block)[0];
-            float angle = get_angle_between(bad_seg.p2 - bad_seg.p1, tank->get_dir());
+            float angle = (bad_seg.p2 - bad_seg.p1).angle_angle_between(tank->get_dir());
             float sign = 1;
 
             if ((0 <= angle && angle < 90) || (angle < -90)) {
                 sign *= -1;
             }
 
-            add_angle += sign * TANK_CONSTS::BASE::ROTATION;
+            add_angle += sign * tank->get_angle_speed();
         }
     };
 
@@ -78,15 +72,15 @@ void Game::rotate_tank(int id, float add_angle) {
     auto copy(*tank);
     copy.rotate(add_angle);
 
-    Vec add_dir(0, 0);
+    Vector add_dir(0, 0);
     bool crashed = false;
 
-    auto update = [&crashed, &copy, &add_dir, &tank] (Block *block) {
+    auto update = [&crashed, &copy, &add_dir, &tank](Block *block) {
         if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
             crashed = true;
 
             auto bad_segment = get_bad_segments(&copy, block)[0];
-            Vec perp = normalize(get_normal_vec(tank->get_cords(), Line(bad_segment.p1, bad_segment.p2)));
+            Vector perp = (bad_segment.to_line().get_normal(tank->get_cords())).normalize();
             add_dir += perp;
         }
     };
@@ -104,12 +98,12 @@ void Game::rotate_tank(int id, float add_angle) {
     if (!crashed) {
         tank->rotate(add_angle);
     } else {
-        safe_move(id, TANK_CONSTS::BASE::SPEED, add_dir);
+        safe_move(id, tank->get_speed(), add_dir);
         safe_rotate(id, add_angle / 2);
     }
 }
 
-void Game::add_tank(MovableBlock *a) {
+void Game::add_tank(Tank *a) {
     tanks.push_back(a);
 }
 
@@ -121,7 +115,7 @@ MovableBlock *Game::get_tank(int id) {
     assert(false);
 }
 
-void Game::safe_move(int id, float dist, Vec dir) {
+void Game::safe_move(int id, float dist, Vector dir) {
     MovableBlock *tank = get_tank(id);
 
     float safe = dist;
@@ -169,4 +163,16 @@ void Game::safe_rotate(int id, float add_angle) {
     }
 
     tank->rotate(safe);
+}
+
+const std::vector<Block *> &Game::get_blocks() const {
+    return blocks;
+}
+
+const std::vector<Tank *> Game::get_tanks() const {
+    return tanks;
+}
+
+const std::vector<Bullet *> Game::get_bullets() const {
+    return bullets;
 }
