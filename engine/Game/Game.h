@@ -1,23 +1,42 @@
 #pragma once
+
 #include <vector>
 #include "../entities/Tank/Tank.h"
-#include "../../util/geometry_functions/geometry_functions.h"
+#include "../entities/Bullet/Bullet.h"
+#include <memory>
+
+using std::shared_ptr;
+using std::vector;
 
 class Game {
-	std::vector<Block*> blocks;
-    std::vector<Tank*> tanks;
-    std::vector<MovableBlock*> bullets;
+    vector<shared_ptr<Block>> blocks;
+    vector<shared_ptr<Tank>> tanks;
+    vector<shared_ptr<Bullet>> bullets;
+
+    void safe_move(int id, float dist, Vector dir);
+
+    void safe_rotate(int id, float add_angle);
 
 public:
-	void addBlock(Block* a);
-    void add_tank(Tank* a);
+    void add_block(shared_ptr<Block> a);
 
-    void move_tank(int id, float dist);
-    void rotate_tank(int id, float add_angl);
-    void shoot(int id);
-    void move_all_bullets();
-	std::vector<Block*> get_objects();
+    void add_tank(shared_ptr<Tank> a);
 
-	Block* get_block(int id);
-    Tank* get_tank(int id);
+    void add_bullet(shared_ptr<Bullet> a);
+
+    const vector<shared_ptr<Block>> &get_blocks() const;
+
+    const vector<shared_ptr<Tank>> get_tanks() const;
+
+    const vector<shared_ptr<Bullet>> get_bullets() const;
+
+    void move_bullets(float lambda);
+
+    void move_tank(int id, float dist, Vector dir);
+
+    void rotate_tank(int id, float add_angle);
+
+    Block *get_block(int id);
+
+    Tank *get_tank(int id);
 };

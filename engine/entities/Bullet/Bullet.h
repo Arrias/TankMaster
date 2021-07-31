@@ -6,6 +6,4 @@ class Bullet : public MovableBlock {
 
 public:
     Bullet(MovableBlock base, int strength);
-
-    EntityType get_type() override;
 };
