@@ -24,3 +24,9 @@ sf::Texture *TextureLoader::load_texture(std::string entity_type, size_t texture
     return load_texture(path);
 }
 
+TextureLoader::~TextureLoader() {
+    for (auto &i : loaded_textures) {
+        delete i.second;
+    }
+}
+

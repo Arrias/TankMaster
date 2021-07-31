@@ -2,19 +2,19 @@
 #include <cassert>
 #include <iostream>
 
-void Game::add_block(Block *a) {
+void Game::add_block(shared_ptr<Block> a) {
     blocks.push_back(a);
 }
 
 Block *Game::get_block(int id) {
     for (auto el : Game::blocks) {
         if (el->get_id() == id)
-            return el;
+            return el.get();
     }
     assert(false);
 }
 
-void Game::add_bullet(Bullet *a) {
+void Game::add_bullet(shared_ptr<Bullet> a) {
     bullets.push_back(a);
 }
 
@@ -50,12 +50,12 @@ void Game::move_tank(int id, float dist, Vector dir) {
     };
 
     for (auto block : Game::blocks) {
-        update(block);
+        update(block.get());
     }
 
     for (auto other_tank : Game::tanks) {
         if (other_tank->get_id() != tank->get_id()) {
-            update(other_tank);
+            update(other_tank.get());
         }
     }
 
@@ -85,13 +85,13 @@ void Game::rotate_tank(int id, float add_angle) {
         }
     };
 
-    for (auto block : Game::blocks) {
-        update(block);
+    for (auto block : blocks) {
+        update(block.get());
     }
 
-    for (auto other_tank : Game::tanks) {
+    for (auto other_tank : tanks) {
         if (other_tank->get_id() != tank->get_id()) {
-            update(other_tank);
+            update(other_tank.get());
         }
     }
 
@@ -103,14 +103,10 @@ void Game::rotate_tank(int id, float add_angle) {
     }
 }
 
-void Game::add_tank(Tank *a) {
-    tanks.push_back(a);
-}
-
-MovableBlock *Game::get_tank(int id) {
+Tank *Game::get_tank(int id) {
     for (auto el : Game::tanks) {
         if (el->get_id() == id)
-            return el;
+            return el.get();
     }
     assert(false);
 }
@@ -119,7 +115,8 @@ void Game::safe_move(int id, float dist, Vector dir) {
     MovableBlock *tank = get_tank(id);
 
     float safe = dist;
-    for (auto block : Game::blocks) {
+
+    auto update = [&safe, &tank, &dir](Block *block) {
         float lo = 0, hi = safe;
 
         for (int iter = 0; iter < ITER; ++iter) {
@@ -135,6 +132,16 @@ void Game::safe_move(int id, float dist, Vector dir) {
         }
 
         safe = lo;
+    };
+
+    for (auto block : blocks) {
+        update(block.get());
+    }
+
+    for (auto other_tank : tanks) {
+        if (other_tank->get_id() != tank->get_id()) {
+            update(other_tank.get());
+        }
     }
 
     tank->move(safe, dir);
@@ -145,7 +152,7 @@ void Game::safe_rotate(int id, float add_angle) {
 
     float safe = add_angle;
 
-    for (auto block : Game::blocks) {
+    auto update = [&safe, &tank](Block *block) {
         float lo = 0, hi = safe;
 
         for (int iter = 0; iter < ITER; ++iter) {
@@ -160,19 +167,35 @@ void Game::safe_rotate(int id, float add_angle) {
         }
 
         safe = lo;
+    };
+
+    for (auto block : blocks) {
+        update(block.get());
+    }
+    for (auto other_tank : tanks) {
+        if (other_tank->get_id() != tank->get_id()) {
+            update(other_tank.get());
+        }
     }
 
     tank->rotate(safe);
 }
 
-const std::vector<Block *> &Game::get_blocks() const {
+const std::vector<shared_ptr<Block>> &Game::get_blocks() const {
     return blocks;
 }
 
-const std::vector<Tank *> Game::get_tanks() const {
+const std::vector<shared_ptr<Tank>> Game::get_tanks() const {
     return tanks;
 }
 
-const std::vector<Bullet *> Game::get_bullets() const {
+const std::vector<shared_ptr<Bullet>> Game::get_bullets() const {
     return bullets;
 }
+
+void Game::add_tank(shared_ptr<Tank> a) {
+    tanks.push_back(a);
+}
+
+
+

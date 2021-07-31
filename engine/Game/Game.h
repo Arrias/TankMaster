@@ -3,28 +3,32 @@
 #include <vector>
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
+#include <memory>
+
+using std::shared_ptr;
+using std::vector;
 
 class Game {
-    std::vector<Block *> blocks;
-    std::vector<Tank *> tanks;
-    std::vector<Bullet *> bullets;
+    vector<shared_ptr<Block>> blocks;
+    vector<shared_ptr<Tank>> tanks;
+    vector<shared_ptr<Bullet>> bullets;
 
     void safe_move(int id, float dist, Vector dir);
 
     void safe_rotate(int id, float add_angle);
 
 public:
-    void add_block(Block *a);
+    void add_block(shared_ptr<Block> a);
 
-    void add_tank(Tank *a);
+    void add_tank(shared_ptr<Tank> a);
 
-    void add_bullet(Bullet *a);
+    void add_bullet(shared_ptr<Bullet> a);
 
-    const std::vector<Block *> &get_blocks() const;
+    const vector<shared_ptr<Block>> &get_blocks() const;
 
-    const std::vector<Tank *> get_tanks() const;
+    const vector<shared_ptr<Tank>> get_tanks() const;
 
-    const std::vector<Bullet *> get_bullets() const;
+    const vector<shared_ptr<Bullet>> get_bullets() const;
 
     void move_bullets(float lambda);
 
@@ -34,5 +38,5 @@ public:
 
     Block *get_block(int id);
 
-    MovableBlock *get_tank(int id);
+    Tank *get_tank(int id);
 };

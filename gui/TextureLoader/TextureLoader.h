@@ -13,4 +13,6 @@ public:
 	sf::Texture* load_texture(std::string texture_path);
 
 	sf::Texture* load_texture(std::string entity_type, size_t texture_num);
+
+	~TextureLoader();
 };
