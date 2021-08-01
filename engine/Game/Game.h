@@ -3,6 +3,7 @@
 #include <vector>
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
+#include "../gui/constants.h"
 #include <memory>
 
 using std::shared_ptr;
@@ -13,9 +14,9 @@ class Game {
     vector<shared_ptr<Tank>> tanks;
     vector<shared_ptr<Bullet>> bullets;
 
-    void safe_move(int id, float dist, Vector dir);
+    float safe_move(MovableBlock* block_to_move, float dist, Vector dir);
 
-    void safe_rotate(int id, float add_angle);
+    float safe_rotate(MovableBlock* block_to_rotate, float add_angle);
 
 public:
     void add_block(shared_ptr<Block> a);
@@ -32,11 +33,13 @@ public:
 
     void move_bullets(float lambda);
 
-    void move_tank(int id, float dist, Vector dir);
+    void move_movable_object(MovableBlock* block_to_move, float dist, Vector dir);
 
-    void rotate_tank(int id, float add_angle);
+    void rotate_movable_object(MovableBlock* block_to_rotate, float add_angle, float safe_dist, float safe_add_angle);
 
     Block *get_block(int id);
 
     Tank *get_tank(int id);
+
+    void shoot(Tank* tank, float bullet_strength);
 };

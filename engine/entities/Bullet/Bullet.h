@@ -6,4 +6,5 @@ class Bullet : public MovableBlock {
 
 public:
     Bullet(MovableBlock base, int strength);
+    int get_strength() const;
 };

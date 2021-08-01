@@ -49,7 +49,7 @@ bool point_in_block(Vector point, Block *block) {
         Vector b = point - points[i];
         order.insert(is_greater(a.vec_prod(b), 0));
     }
-    return true;
+    return (order.size() == 1);
 }
 
 Intersection get_blocks_intersection(Block *a, Block *b) {
@@ -58,12 +58,12 @@ Intersection get_blocks_intersection(Block *a, Block *b) {
 
     for (int i = 0; i < 4; ++i) {
         int nxt = (i + 1) % 4;
-        segments1[i] = { points1[i], points1[nxt] };
-        segments2[i] = { points2[i], points2[nxt] };
+        segments1[i] = {points1[i], points1[nxt]};
+        segments2[i] = {points2[i], points2[nxt]};
     }
-    if(point_in_block(points1[0], b))
+    if (point_in_block(points1[0], b))
         return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, points1[0]};
-    if(point_in_block(points2[0], a))
+    if (point_in_block(points2[0], a))
         return {INTERSECTION_TYPE::HAVE_INTERSECTIONS, points2[0]};
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {

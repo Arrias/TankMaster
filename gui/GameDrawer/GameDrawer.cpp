@@ -30,7 +30,8 @@ void GameDrawer::draw_game(sf::RenderWindow &window) {
     }
 
     for (auto bullet : game->get_bullets()) {
-        auto texture = texture_loader->load_texture(BULLET, id_to_texture[bullet->get_id()]);
+        //auto texture = texture_loader->load_texture(BULLET, id_to_texture[bullet->get_id()]);
+        auto texture = texture_loader->load_texture(BULLET, 1);
         draw_object(bullet.get(), window, texture);
     }
 }

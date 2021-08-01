@@ -3,11 +3,9 @@
 #include "../MovableBlock/MovableBlock.h"
 
 class Tank : public MovableBlock {
+public:
     float health;
     int ammunition = 10000;
-public:
     Tank(MovableBlock base, float hp);
-
-    float get_health() const;
 };
 
