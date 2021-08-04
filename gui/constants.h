@@ -18,8 +18,8 @@ namespace WINDOWS_CONSTS {
 
 namespace TANK_CONSTS {
     namespace BASE {
-        const float SPEED = 0.3;
-        const float ROTATION = 0.3;
+        const float SPEED = 0.4;
+        const float ROTATION = 0.4;
     }
 
     const float HEIGHT = 82;
@@ -28,7 +28,7 @@ namespace TANK_CONSTS {
 
 namespace BULLET_CONSTS {
     namespace BASE {
-        const float SPEED = 0.3;
+        const float SPEED = 0.5;
     }
 
     const float HEIGHT = 14;

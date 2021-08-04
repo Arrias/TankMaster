@@ -16,13 +16,14 @@ struct TankController {
     Game *game;
     sf::Keyboard::Key left, right, up, down, fire;
 
-    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down, Keyboard::Key fire) : tank(tank),
-                                                                                                                            game(game),
-                                                                                                                            left(left),
-                                                                                                                            right(right),
-                                                                                                                            up(up),
-                                                                                                                            down(down),
-                                                                                                                            fire(fire) {}
+    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down,
+                   Keyboard::Key fire) : tank(tank),
+                                         game(game),
+                                         left(left),
+                                         right(right),
+                                         up(up),
+                                         down(down),
+                                         fire(fire) {}
 
     bool moveUp = false;
     bool moveLeft = false;
@@ -72,10 +73,12 @@ struct TankController {
             game->move_movable_object(tank, lambda * tank->get_speed(), tank->get_dir());
         }
         if (moveLeft) {
-            game->rotate_movable_object(tank, lambda * -TANK_CONSTS::BASE::ROTATION, tank->get_speed(),lambda * -TANK_CONSTS::BASE::ROTATION/2);
+            game->rotate_movable_object(tank, lambda * -TANK_CONSTS::BASE::ROTATION, tank->get_speed(),
+                                        lambda * -TANK_CONSTS::BASE::ROTATION / 2);
         }
         if (moveRight) {
-            game->rotate_movable_object(tank, lambda * TANK_CONSTS::BASE::ROTATION, tank->get_speed(),lambda * TANK_CONSTS::BASE::ROTATION/2 );
+            game->rotate_movable_object(tank, lambda * TANK_CONSTS::BASE::ROTATION, tank->get_speed(),
+                                        lambda * TANK_CONSTS::BASE::ROTATION / 2);
         }
     }
 };
@@ -145,14 +148,15 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
 
     int bullet_id1 = get_new_id();
     game_drawer.set_texture_num(bullet_id1, 1);
-        //game.add_bullet(std::shared_ptr<Bullet>(new Bullet(MovableBlock(Block(Vector(100, 100), Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT),
-        //                                            bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
-        //                       5)));
+    //game.add_bullet(std::shared_ptr<Bullet>(new Bullet(MovableBlock(Block(Vector(100, 100), Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT),
+    //                                            bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
+    //                       5)));
 
 }
 
 void SingleGame::active() {
     RenderWindow window(VideoMode(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
+    window.setFramerateLimit(50);
 
     Game game;
     GameDrawer game_drawer(&game, floor_type, texture_loader);
@@ -173,7 +177,6 @@ void SingleGame::active() {
             t1.update(event);
             t2.update(event);
         }
-
         auto current_time = std::chrono::high_resolution_clock().now();
         auto lambda = (current_time - global_time).count() / 1e6;
         global_time = current_time;

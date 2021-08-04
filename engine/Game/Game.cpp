@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <cassert>
 #include <iostream>
+#include "../../gui/constants.h"
 
 void Game::add_block(shared_ptr<Block> a) {
     blocks.push_back(a);
@@ -21,14 +22,14 @@ void Game::add_bullet(shared_ptr<Bullet> a) {
 void Game::move_bullets(float lambda) {
     vector<shared_ptr<Bullet>> active_bullets;
     for (auto bullet : bullets) {
-        float dist = bullet->get_speed()*lambda;
+        float dist = bullet->get_speed() * lambda;
 
         bool IS_HIT = false;
-        while(is_greater(dist,eps)) {
+        while (is_greater(dist, eps)) {
             dist -= safe_move(bullet.get(), dist, bullet->get_dir());
 
-            if(is_greater(dist,eps)) {
-                bullet->move(dist,bullet->get_dir());
+            if (is_greater(dist, eps)) {
+                bullet->move(dist, bullet->get_dir());
 
                 for (auto tank : Game::tanks) {
                     if (get_blocks_intersection(bullet.get(), tank.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
@@ -37,17 +38,17 @@ void Game::move_bullets(float lambda) {
                         break;
                     }
                 }
-                if(IS_HIT) break;
+                if (IS_HIT) break;
 
-                Vector new_dir = Vector(0,0);
+                Vector new_dir = Vector(0, 0);
                 int amount = 0;
-                Line dir_line = Line(bullet->get_cords(),bullet->get_cords()+bullet->get_dir());
+                Line dir_line = Line(bullet->get_cords(), bullet->get_cords() + bullet->get_dir());
                 for (auto block : Game::blocks) {
-                    if(amount>1)
+                    if (amount > 1)
                         break;
 
-                    for(auto bad_seg : get_bad_segments(bullet.get(), block.get())) {
-                        if(amount) {
+                    for (auto bad_seg : get_bad_segments(bullet.get(), block.get())) {
+                        if (amount) {
                             ++amount;
                             break;
                         }
@@ -59,33 +60,33 @@ void Game::move_bullets(float lambda) {
                         float angle2 = dir_line.get_dir_vec().angle_angle_between(seg_line.get_dir_vec().rotate(180));
 
                         float incidence_angle = angle1;
-                        if(is_greater(std::abs(angle1),std::abs(angle2)))
+                        if (is_greater(std::abs(angle1), std::abs(angle2)))
                             incidence_angle = angle2;
 
-                        float rotation_angle = 90-std::abs(incidence_angle);
-                        if(is_greater(0,incidence_angle))
-                            rotation_angle*=-1;
-                        new_dir = bullet->get_dir().rotate(180-rotation_angle*2);
+                        float rotation_angle = 90 - std::abs(incidence_angle);
+                        if (is_greater(0, incidence_angle))
+                            rotation_angle *= -1;
+                        new_dir = bullet->get_dir().rotate(180 - rotation_angle * 2);
                         ++amount;
                     }
                 }
 
-                bullet->move(-dist,bullet->get_dir());
-                if(amount>1 || !is_greater(new_dir.len(),eps)) {
+                bullet->move(-dist, bullet->get_dir());
+                if (amount > 1 || !is_greater(new_dir.len(), eps)) {
                     bullet->rotate(180);
-                }
-                else {
+                } else {
                     new_dir.y *= -1;
                     // Vector(0,-1).polar() = 270
                     float sfml_angle = 270 - rad_to_deg(new_dir.polar());
-                    if(sfml_angle>180)
+                    if (sfml_angle > 180)
                         sfml_angle -= 360;
 
-                    rotate_movable_object(bullet.get(), -bullet->get_angle()+sfml_angle, bullet->get_size().y/2, -bullet->get_angle()+sfml_angle);
+                    rotate_movable_object(bullet.get(), -bullet->get_angle() + sfml_angle, bullet->get_size().y / 2,
+                                          -bullet->get_angle() + sfml_angle);
                 }
             }
         }
-        if(!IS_HIT) {
+        if (!IS_HIT) {
             active_bullets.push_back(bullet);
         }
     }
@@ -94,8 +95,70 @@ void Game::move_bullets(float lambda) {
 
 const int ITER = 20; // bp iterations count
 
+float Game::get_max_safe_dist_to_move(MovableBlock *block_to_move, float safe, Vector dir) {
+    auto update = [&safe, &block_to_move, &dir](Block *block) {
+        float lo = 0, hi = safe;
+
+        for (int iter = 0; iter < ITER; ++iter) {
+            float mid = (lo + hi) / 2;
+            auto copy(*block_to_move);
+            copy.move(mid, dir);
+            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+            copy.move(-mid, dir);
+        }
+
+        safe = lo;
+    };
+    for (auto i : blocks) {
+        if (i->get_id() != block_to_move->get_id()) {
+            update(i.get());
+        }
+    }
+    for (auto i : tanks) {
+        if (i->get_id() != block_to_move->get_id()) {
+            update(i.get());
+        }
+    }
+    return safe;
+}
+
+float Game::get_max_safe_dist_to_rotate(MovableBlock *block_to_rotate, float safe) {
+    auto update = [&safe, &block_to_rotate](Block *block) {
+        float lo = 0, hi = safe;
+
+        for (int iter = 0; iter < ITER; ++iter) {
+            float mid = (lo + hi) / 2;
+            auto copy(*block_to_rotate);
+            copy.rotate(mid);
+            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+
+        safe = lo;
+    };
+    for (auto i : blocks) {
+        if (i->get_id() != block_to_rotate->get_id()) {
+            update(i.get());
+        }
+    }
+    for (auto i : tanks) {
+        if (i->get_id() != block_to_rotate->get_id()) {
+            update(i.get());
+        }
+    }
+    return safe;
+}
+
 void Game::move_movable_object(MovableBlock *block_to_move, float dist, Vector dir) {
-    block_to_move->move(dist, dir);
+    safe_move(block_to_move, dist, dir);
+    block_to_move->move(eps, dir);
 
     float add_angle = 0;
     bool crashed = false;
@@ -127,10 +190,8 @@ void Game::move_movable_object(MovableBlock *block_to_move, float dist, Vector d
     }
 
     if (crashed) {
-        block_to_move->move(-dist, dir);
-        safe_move(block_to_move, -dist / 4, dir);
-        safe_rotate(block_to_move, 2 * add_angle);
-        // Эти константы я подогнал (так лучше смотрится по ощущениям), тут должно быть что-то физическое
+        block_to_move->move(-eps, dir);
+        rotate_movable_object(block_to_move, 5 * add_angle, 2 * block_to_move->get_speed(), 2 * add_angle);
     }
 }
 
@@ -177,71 +238,14 @@ Tank *Game::get_tank(int id) {
     assert(false);
 }
 
-float Game::safe_move(MovableBlock* block_to_move, float dist, Vector dir) {
-    float safe = dist;
-
-    auto update = [&safe, &block_to_move, &dir](Block *block) {
-        float lo = 0, hi = safe;
-
-        for (int iter = 0; iter < ITER; ++iter) {
-            float mid = (lo + hi) / 2;
-            auto copy(*block_to_move);
-            copy.move(mid, dir);
-            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
-                lo = mid;
-            } else {
-                hi = mid;
-            }
-            copy.move(-mid, dir);
-        }
-
-        safe = lo;
-    };
-
-    for (auto block : blocks) {
-        update(block.get());
-    }
-
-    for (auto other_tank : tanks) {
-        if (other_tank->get_id() != block_to_move->get_id()) {
-            update(other_tank.get());
-        }
-    }
-
+float Game::safe_move(MovableBlock *block_to_move, float dist, Vector dir) {
+    float safe = get_max_safe_dist_to_move(block_to_move, dist, dir);
     block_to_move->move(safe, dir);
     return safe;
 }
 
-float Game::safe_rotate(MovableBlock* block_to_rotate, float add_angle) {
-
-    float safe = add_angle;
-
-    auto update = [&safe, &block_to_rotate](Block *block) {
-        float lo = 0, hi = safe;
-
-        for (int iter = 0; iter < ITER; ++iter) {
-            float mid = (lo + hi) / 2;
-            auto copy(*block_to_rotate);
-            copy.rotate(mid);
-            if (get_blocks_intersection(&copy, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) {
-                lo = mid;
-            } else {
-                hi = mid;
-            }
-        }
-
-        safe = lo;
-    };
-
-    for (auto block : blocks) {
-        update(block.get());
-    }
-    for (auto other_tank : tanks) {
-        if (other_tank->get_id() != block_to_rotate->get_id()) {
-            update(other_tank.get());
-        }
-    }
-
+float Game::safe_rotate(MovableBlock *block_to_rotate, float add_angle) {
+    float safe = get_max_safe_dist_to_rotate(block_to_rotate, add_angle);
     block_to_rotate->rotate(safe);
     return safe;
 }
@@ -262,17 +266,17 @@ void Game::add_tank(shared_ptr<Tank> a) {
     tanks.push_back(a);
 }
 
-void Game::shoot(Tank* tank, float bullet_strength) {
-    if(tank->ammunition) {
+void Game::shoot(Tank *tank, float bullet_strength) {
+    if (tank->ammunition) {
         Vector cords = tank->get_cords(), dir = tank->get_dir();
-        float dist_to_move = tank->get_size().y/2+BULLET_CONSTS::HEIGHT+10*eps;
-        cords += dir * std::sqrt(dist_to_move*dist_to_move/(dir.x*dir.x+dir.y*dir.y));
+        float dist_to_move = tank->get_size().y / 2 + BULLET_CONSTS::HEIGHT + 10 * eps;
+        cords += dir * dist_to_move; // std::sqrt(dist_to_move * dist_to_move / (dir.x * dir.x + dir.y * dir.y));
 
         auto bullet = shared_ptr<Bullet>(new Bullet(
                 MovableBlock(Block(cords, Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT), 9, tank->get_angle()), dir,
                              BULLET_CONSTS::BASE::SPEED,
                              0),
-                             bullet_strength));
+                bullet_strength));
         --tank->ammunition;
 
         bool IS_HIT = false;
@@ -283,7 +287,7 @@ void Game::shoot(Tank* tank, float bullet_strength) {
                 break;
             }
         }
-        if(!IS_HIT) {
+        if (!IS_HIT) {
             bool IN_BLOCK = false;
             for (auto block : Game::blocks) {
                 if (get_blocks_intersection(bullet.get(), block.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
@@ -291,7 +295,7 @@ void Game::shoot(Tank* tank, float bullet_strength) {
                     break;
                 }
             }
-            if(IN_BLOCK)
+            if (IN_BLOCK)
                 tank->health -= bullet->get_strength();
             else
                 add_bullet(bullet);

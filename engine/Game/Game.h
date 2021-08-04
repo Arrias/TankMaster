@@ -3,7 +3,6 @@
 #include <vector>
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
-#include "../gui/constants.h"
 #include <memory>
 
 using std::shared_ptr;
@@ -14,9 +13,13 @@ class Game {
     vector<shared_ptr<Tank>> tanks;
     vector<shared_ptr<Bullet>> bullets;
 
-    float safe_move(MovableBlock* block_to_move, float dist, Vector dir);
+    float get_max_safe_dist_to_move(MovableBlock *block_to_move, float safe, Vector dir);
 
-    float safe_rotate(MovableBlock* block_to_rotate, float add_angle);
+    float get_max_safe_dist_to_rotate(MovableBlock *block_to_move, float safe);
+
+    float safe_move(MovableBlock *block_to_move, float dist, Vector dir);
+
+    float safe_rotate(MovableBlock *block_to_rotate, float add_angle);
 
 public:
     void add_block(shared_ptr<Block> a);
@@ -33,13 +36,13 @@ public:
 
     void move_bullets(float lambda);
 
-    void move_movable_object(MovableBlock* block_to_move, float dist, Vector dir);
+    void move_movable_object(MovableBlock *block_to_move, float dist, Vector dir);
 
-    void rotate_movable_object(MovableBlock* block_to_rotate, float add_angle, float safe_dist, float safe_add_angle);
+    void rotate_movable_object(MovableBlock *block_to_rotate, float add_angle, float safe_dist, float safe_add_angle);
 
     Block *get_block(int id);
 
     Tank *get_tank(int id);
 
-    void shoot(Tank* tank, float bullet_strength);
+    void shoot(Tank *tank, float bullet_strength);
 };
