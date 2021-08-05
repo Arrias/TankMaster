@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(TankMaster)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
@@ -21,3 +21,10 @@ add_executable(TankMaster main/TankMaster.cpp
         gui/Button/Button.cpp gui/Button/Button.h gui/MainMenu/MainMenu.cpp gui/MainMenu/MainMenu.h gui/Window/Window.cpp gui/Window/Window.h gui/SingleGame/SingleGame.cpp gui/SingleGame/SingleGame.h)
 
 target_link_libraries(TankMaster sfml-graphics sfml-audio)
+
+find_package( Threads )
+add_executable(Registry registry/main.cpp mongoose/mongoose.cpp mongoose/mongoose.h web/User/User.cpp web/User/User.h)
+target_link_libraries( Registry ${CMAKE_THREAD_LIBS_INIT} )
+target_link_libraries(Registry sfml-graphics sfml-audio)
+
+add_executable(TestWs registry/test_ws.cpp mongoose/mongoose.cpp mongoose/mongoose.h)

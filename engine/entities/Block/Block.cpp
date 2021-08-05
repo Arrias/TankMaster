@@ -42,14 +42,14 @@ std::vector<Vector> get_block_points(Block *block) {
 
 bool point_in_block(Vector point, Block *block) {
     std::vector<Vector> points = get_block_points(block);
-    std::set<bool> order;
+    float sum = 0;
     for (int i = 0; i < 4; ++i) {
         int nxt = (i + 1) % 4;
-        Vector a = points[nxt] - points[i];
-        Vector b = point - points[i];
-        order.insert(is_greater(a.vec_prod(b), 0));
+        Vector a = points[i] - point;
+        Vector b = points[nxt] - point;
+        sum += fabs(a.vec_prod(b));
     }
-    return (order.size() == 1);
+    return is_equal(sum, 2 * block->get_size().x * block->get_size().y);
 }
 
 Intersection get_blocks_intersection(Block *a, Block *b) {

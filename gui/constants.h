@@ -4,6 +4,8 @@
 #include <sstream>
 #include "../gui/constants.h"
 
+const int FPS_LIMIT = 50;
+
 namespace GAME_CONSTS {
     const std::string NAME = "TankMaster";
     const std::string version = "0.0.1";
@@ -13,6 +15,10 @@ namespace WINDOWS_CONSTS {
     namespace SINGLE_GAME {
         const size_t HEIGHT = 900;
         const size_t WIDTH = 1600;
+    }
+    namespace MAIN_MENU {
+        const size_t HEIGHT = 600;
+        const size_t WIDTH = 800;
     }
 }
 

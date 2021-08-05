@@ -28,6 +28,8 @@ public:
     friend std::vector<Segment> get_bad_segments(Block *a, Block *b);
 };
 
+bool point_in_block(Vector point, Block *block);
+
 std::vector<Vector> get_block_points(Block *a);
 
 Intersection get_blocks_intersection(Block *a, Block *b);

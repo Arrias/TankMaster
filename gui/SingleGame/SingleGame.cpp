@@ -156,7 +156,7 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
 
 void SingleGame::active() {
     RenderWindow window(VideoMode(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
-    window.setFramerateLimit(50);
+    window.setFramerateLimit(FPS_LIMIT);
 
     Game game;
     GameDrawer game_drawer(&game, floor_type, texture_loader);
@@ -166,6 +166,7 @@ void SingleGame::active() {
     TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S, Keyboard::F);
 
     auto global_time = std::chrono::high_resolution_clock().now();
+
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {

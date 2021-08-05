@@ -6,6 +6,11 @@
 #include "../Window/Window.h"
 
 struct MainMenu : public Window {
+    MainMenu(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader);
+
     void active() override;
+
+private:
+    void make_menu(sf::RenderWindow &window);
 };
 
