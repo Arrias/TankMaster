@@ -1,6 +1,5 @@
 #include "Game.h"
 #include <cassert>
-#include <iostream>
 
 void Game::add_block(shared_ptr<Block> a) {
     blocks.push_back(a);
@@ -193,9 +192,55 @@ const std::vector<shared_ptr<Bullet>> Game::get_bullets() const {
     return bullets;
 }
 
-void Game::add_tank(shared_ptr<Tank> a) {
+shared_ptr<Tank> Game::add_tank(shared_ptr<Tank> a) {
     tanks.push_back(a);
+    return a;
 }
 
+sf::Packet operator>>(sf::Packet &packet, Game &game) {
+    Game temp;
+    sf::Int32 blocks_count;
+    packet >> blocks_count;
+    for (int i = 0; i < blocks_count; i++) {
+        Block block;
+        packet >> block;
+        temp.add_block(std::shared_ptr<Block>(new Block(block)));
+    }
 
+    sf::Int32 tanks_count;
+    packet >> tanks_count;
+    for(int i = 0; i < tanks_count; i++) {
+        Tank tank;
+        packet >> tank;
+        temp.add_tank(std::shared_ptr<Tank>(new Tank(tank)));
+    }
+
+    sf::Int32 bullets_count;
+    packet >> bullets_count;
+    for(int i = 0; i < bullets_count; i++) {
+        Bullet bullet;
+        packet >> bullet;
+        temp.add_bullet(std::shared_ptr<Bullet>(new Bullet(bullet)));
+    }
+    game = temp;
+    return packet;
+}
+
+sf::Packet operator<<(sf::Packet &packet, Game &game) {
+    auto blocks = game.get_blocks();
+    packet << (sf::Int32)blocks.size();
+    for (auto &block : blocks)
+        packet << *block;
+
+    auto tanks = game.get_tanks();
+    packet << (sf::Int32)tanks.size();
+    for (auto &tank : tanks)
+        packet << *tank;
+
+    auto bullets = game.get_bullets();
+    packet << (sf::Int32)bullets.size();
+    for (auto &bullet : bullets)
+        packet << *bullet;
+    return packet;
+}
 

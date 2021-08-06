@@ -1,6 +1,4 @@
 #include "Block.h"
-#include <iostream> // for debug
-#include <iomanip>
 #include <set>
 
 Block::Block(Vector cords, Vector size, int id, float angle) : cords(cords), size(size), id(id),
@@ -96,4 +94,14 @@ std::vector<Segment> get_bad_segments(Block *a, Block *b) {
         }
     }
     return bad_segments;
+}
+
+sf::Packet& operator>> (sf::Packet &packet, Block &block) {
+    packet >> block.cords >> block.size >> block.id >> block.angle;
+    return packet;
+}
+
+sf::Packet& operator<< (sf::Packet &packet, Block &block) {
+    packet << block.cords << block.size << block.id << block.angle;
+    return packet;
 }

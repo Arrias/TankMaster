@@ -1,78 +1,13 @@
-//
-// Created by arrias on 31.07.2021.
-//
-
 #include "SingleGame.h"
 #include "../../gui/GameDrawer/GameDrawer.h"
+#include "../SingleGame/TankController/TankController.h"
 #include <chrono>
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
+const int FPS = 60;
 
 using namespace sf;
-
-struct TankController {
-    Tank *tank;
-    Game *game;
-    sf::Keyboard::Key left, right, up, down;
-
-    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down) : tank(tank),
-                                                                                                                            game(game),
-                                                                                                                            left(left),
-                                                                                                                            right(right),
-                                                                                                                            up(up),
-                                                                                                                            down(down) {}
-
-    bool moveUp = false;
-    bool moveLeft = false;
-    bool moveDown = false;
-    bool moveRight = false;
-
-    void update(Event &e) {
-        if (e.type == Event::KeyPressed) {
-            if (e.key.code == up) {
-                moveUp = true;
-            }
-            if (e.key.code == down) {
-                moveDown = true;
-            }
-            if (e.key.code == right) {
-                moveRight = true;
-            }
-            if (e.key.code == left) {
-                moveLeft = true;
-            }
-        } else if (e.type == Event::KeyReleased) {
-            if (e.key.code == up) {
-                moveUp = false;
-            }
-            if (e.key.code == down) {
-                moveDown = false;
-            }
-            if (e.key.code == right) {
-                moveRight = false;
-            }
-            if (e.key.code == left) {
-                moveLeft = false;
-            }
-        }
-    }
-
-    void move(float lambda) {
-        if (moveDown) {
-            game->move_tank(tank->get_id(), lambda * -tank->get_speed(), tank->get_dir());
-        }
-        if (moveUp) {
-            game->move_tank(tank->get_id(), lambda * tank->get_speed(), tank->get_dir());
-        }
-        if (moveLeft) {
-            game->rotate_tank(tank->get_id(), lambda * -TANK_CONSTS::BASE::ROTATION);
-        }
-        if (moveRight) {
-            game->rotate_tank(tank->get_id(), lambda * TANK_CONSTS::BASE::ROTATION);
-        }
-    }
-};
 
 void sample_game_init(Game &game, GameDrawer &game_drawer) {
     int id = 0;
@@ -155,7 +90,7 @@ void SingleGame::active() {
     TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down);
     TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S);
 
-    auto global_time = std::chrono::high_resolution_clock().now();
+    sf::Clock clock;
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -168,13 +103,14 @@ void SingleGame::active() {
             t2.update(event);
         }
 
-        auto current_time = std::chrono::high_resolution_clock().now();
-        auto lambda = (current_time - global_time).count() / 1e6;
-        global_time = current_time;
+        if(clock.getElapsedTime().asMilliseconds() < 1000 / FPS)
+            continue;
+        double delta_time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
 
-        t1.move(lambda);
-        t2.move(lambda);
-        game.move_bullets(lambda);
+        t1.move(delta_time);
+        t2.move(delta_time);
+        game.move_bullets(delta_time);
 
         window.clear(Color(0, 0, 0));
         game_drawer.draw_game(window);

@@ -9,7 +9,7 @@ sf::Texture *TextureLoader::load_texture(std::string texture_path) {
     return loaded_textures[texture_path];
 }
 
-std::string TextureLoader::getPathToTexture(std::string entity_type, size_t texture_num) {
+std::string TextureLoader::get_path_to_texture(std::string entity_type, size_t texture_num) {
     std::stringstream ret;
     ret << "../textures/";
     ret << entity_type;
@@ -20,7 +20,7 @@ std::string TextureLoader::getPathToTexture(std::string entity_type, size_t text
 }
 
 sf::Texture *TextureLoader::load_texture(std::string entity_type, size_t texture_num) {
-    auto path = getPathToTexture(entity_type, texture_num);
+    auto path = get_path_to_texture(entity_type, texture_num);
     return load_texture(path);
 }
 
