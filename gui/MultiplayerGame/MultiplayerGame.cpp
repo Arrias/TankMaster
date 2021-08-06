@@ -2,12 +2,12 @@
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include <SFML/Network.hpp>
 #include <chrono>
-#include <iostream>
+
 using namespace sf;
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
-const int FPS = 60, RPS = 80;
+const int FPS = 40;
 IpAddress IP = IpAddress::getLocalAddress();
 int PORT = 2000;
 
@@ -17,12 +17,9 @@ void MultiplayerGame::active() {
     RenderWindow window(VideoMode(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
 
     sf::TcpSocket socket;
-    socket.setBlocking(false);
 
     if (socket.connect(IP, PORT) == sf::Socket::Status::Done) {
-        std::cout << "CONNECTED" << std::endl;
-
-        sf::Clock clock;
+        sf::Clock fps_clock;
         bool moveForward = false, moveRight = false, moveLeft = false, moveBack = false;
 
         while (window.isOpen()) {
@@ -54,17 +51,24 @@ void MultiplayerGame::active() {
                 }
             }
 
-            if (clock.getElapsedTime().asMilliseconds() >= 1000 / RPS) { //SEND USER INPUT
-                sf::Packet packet;
-                packet << moveRight << moveLeft << moveBack << moveForward;
-                socket.send(packet);
-            }
+            if (fps_clock.getElapsedTime().asMilliseconds() >= 1000 / FPS) {
+                fps_clock.restart();
 
-            if (clock.getElapsedTime().asMilliseconds() >= 1000 / FPS) { //RECEIVE GAME AND REDRAW
-                sf::Packet packet;
+                if(moveRight || moveLeft || moveBack || moveForward) {
+                    sf::Packet packet; //SEND USER INPUT
+                    packet << moveRight << moveLeft << moveBack << moveForward;
+                    socket.send(packet);
+                }
+
+                sf::Packet packet; //RECEIVE GAME AND REDRAW
                 if (socket.receive(packet) == sf::Socket::Status::Done)
                     packet >> game;
-                clock.restart();
+
+                for(auto &i : game.get_blocks())
+                    game_drawer.set_texture_num(i->get_id(), 1);
+                for(auto &i : game.get_tanks())
+                    game_drawer.set_texture_num(i->get_id(), 2);
+
                 window.clear(Color(0, 0, 0));
                 game_drawer.draw_game(window);
                 window.display();
@@ -75,18 +79,3 @@ void MultiplayerGame::active() {
 
 MultiplayerGame::MultiplayerGame(std::vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader) : Window(nav,
                                                                                                                texture_loader) {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

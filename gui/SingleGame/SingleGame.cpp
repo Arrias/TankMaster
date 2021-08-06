@@ -2,6 +2,7 @@
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include "../SingleGame/TankController/TankController.h"
 #include <chrono>
+#include <memory>
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
@@ -23,17 +24,17 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
     game_drawer.set_texture_num(tank_id1, 2);
     game_drawer.set_texture_num(tank_id2, 3);
 
-    game.add_tank(shared_ptr<Tank>(new Tank(
+    game.add_tank(std::make_shared<Tank>(
             MovableBlock(Block(Vector(500, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id1, 0), Vector(0, 1),
                          TANK_CONSTS::BASE::SPEED,
                          TANK_CONSTS::BASE::ROTATION),
-            100.0)));
+            100.0));
 
-    game.add_tank(shared_ptr<Tank>(new Tank(
+    game.add_tank(std::make_shared<Tank>(
             MovableBlock(Block(Vector(800, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id2, 0), Vector(0, 1),
                          TANK_CONSTS::BASE::SPEED,
                          TANK_CONSTS::BASE::ROTATION),
-            100.0)));
+            100.0));
 
     // Add borders
     int wall_id1 = get_new_id();
@@ -51,24 +52,24 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
     int wall_id7 = get_new_id();
     game_drawer.set_texture_num(wall_id7, 1);
 
-    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
-                                               Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), wall_id1, 0)));
-    game.add_block(shared_ptr<Block>(
-            new Block(Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH - wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
+    game.add_block(std::make_shared<Block>(Vector(wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
+                                               Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), wall_id1, 0));
+    game.add_block(std::make_shared<Block>(
+            Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH - wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
                       Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT),
-                      wall_id2, 0)));
+                      wall_id2, 0));
 
-    game.add_block(shared_ptr<Block>(new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, wall_thick / 2),
-                                               Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
-    game.add_block(shared_ptr<Block>(
-            new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT - wall_thick / 2),
+    game.add_block(std::make_shared<Block>(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, wall_thick / 2),
+                                               Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0));
+    game.add_block(std::make_shared<Block>(
+            Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT - wall_thick / 2),
                       Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick),
-                      wall_id4, 0)));
+                      wall_id4, 0));
 
     // Add sample obstacles
-    game.add_block(shared_ptr<Block>(new Block(Vector(200, 200), Vector(50, 300), wall_id5, 35)));
-    game.add_block(shared_ptr<Block>(new Block(Vector(500, 500), Vector(100, 100), wall_id6, 45)));
-    game.add_block(shared_ptr<Block>(new Block(Vector(800, 800), Vector(300, 1000), wall_id7, 69)));
+    game.add_block(std::make_shared<Block>(Vector(200, 200), Vector(50, 300), wall_id5, 35));
+    game.add_block(std::make_shared<Block>(Vector(500, 500), Vector(100, 100), wall_id6, 45));
+    game.add_block(std::make_shared<Block>(Vector(800, 800), Vector(300, 1000), wall_id7, 69));
 
     // Add bullet
 
@@ -105,7 +106,7 @@ void SingleGame::active() {
 
         if(clock.getElapsedTime().asMilliseconds() < 1000 / FPS)
             continue;
-        double delta_time = clock.getElapsedTime().asMilliseconds();
+        float delta_time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
 
         t1.move(delta_time);
