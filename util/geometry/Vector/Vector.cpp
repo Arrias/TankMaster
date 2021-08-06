@@ -5,30 +5,30 @@ Vector::Vector(float x, float y) : x(x), y(y) {}
 
 Vector::Vector(sf::Vector2f vec) : x(vec.x), y(vec.y) {}
 
-sf::Vector2f Vector::to_sfml_vector() {
+sf::Vector2f Vector::to_sfml_vector() const {
     return sf::Vector2f(x, y);
 }
 
-float Vector::scalar_prod(Vector oth) {
+float Vector::scalar_prod(Vector oth) const {
     return x * oth.x + y * oth.y;
 }
 
-float Vector::vec_prod(Vector oth) {
+float Vector::vec_prod(Vector oth) const {
     return x * oth.y - oth.x * y;
 }
 
-Vector Vector::normalize() {
+Vector Vector::normalize() const {
     return Vector(x / len(), y / len());
 }
 
-float Vector::polar() {
+float Vector::polar() const {
     float res = atan2(y, x);
     if (res < 0)
         res += 2 * PI;
     return res;
 }
 
-Vector Vector::rotate(float angle) {
+Vector Vector::rotate(float angle) const {
     angle = deg_to_rad(angle);
     Vector ret;
     ret.x = x * cos(angle) - y * sin(angle);
@@ -36,7 +36,7 @@ Vector Vector::rotate(float angle) {
     return ret;
 }
 
-float Vector::len() {
+float Vector::len() const{
     return sqrt(x * x + y * y);
 }
 
@@ -68,7 +68,7 @@ void Vector::operator*=(float scalar) {
     *this = *this * scalar;
 }
 
-float Vector::angle_angle_between(Vector oth) {
+float Vector::angle_angle_between(Vector oth) const {
     float a1 = polar(), a2 = oth.polar();
     float res = a1 - a2;
     if (res > PI)
@@ -77,3 +77,14 @@ float Vector::angle_angle_between(Vector oth) {
         res += 2 * PI;
     return rad_to_deg(-res);
 }
+
+sf::Packet& operator>> (sf::Packet &packet, Vector &v) {
+    packet >> v.x >> v.y;
+    return packet;
+}
+
+sf::Packet& operator<< (sf::Packet &packet, Vector &v) {
+    packet << v.x << v.y;
+    return packet;
+}
+
