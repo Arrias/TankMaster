@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <cassert>
+#include <memory>
 
 void Game::add_block(shared_ptr<Block> a) {
     blocks.push_back(a);
@@ -204,7 +205,7 @@ sf::Packet operator>>(sf::Packet &packet, Game &game) {
     for (int i = 0; i < blocks_count; i++) {
         Block block;
         packet >> block;
-        temp.add_block(std::shared_ptr<Block>(new Block(block)));
+        temp.add_block(std::make_shared<Block>(block));
     }
 
     sf::Int32 tanks_count;
@@ -212,7 +213,7 @@ sf::Packet operator>>(sf::Packet &packet, Game &game) {
     for(int i = 0; i < tanks_count; i++) {
         Tank tank;
         packet >> tank;
-        temp.add_tank(std::shared_ptr<Tank>(new Tank(tank)));
+        temp.add_tank(std::make_shared<Tank>(tank));
     }
 
     sf::Int32 bullets_count;
@@ -220,7 +221,7 @@ sf::Packet operator>>(sf::Packet &packet, Game &game) {
     for(int i = 0; i < bullets_count; i++) {
         Bullet bullet;
         packet >> bullet;
-        temp.add_bullet(std::shared_ptr<Bullet>(new Bullet(bullet)));
+        temp.add_bullet(std::make_shared<Bullet>(bullet));
     }
     game = temp;
     return packet;

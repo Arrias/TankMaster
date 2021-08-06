@@ -1,10 +1,6 @@
-#include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
-#include "../engine/Game/Game.h"
-#include "../gui/constants.h"
 #include "../gui/MultiplayerGame/MultiplayerGame.h"
 #include <memory>
-#include <iostream>
 
 using namespace std; // WTF DUDE?
 

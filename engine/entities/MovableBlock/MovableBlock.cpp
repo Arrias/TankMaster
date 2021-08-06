@@ -26,16 +26,11 @@ float MovableBlock::get_angle_speed() const {
 }
 
 sf::Packet& operator>>(sf::Packet &packet, MovableBlock &block) {
-    Block base;
-    Vector dir;
-    float speed, angle_speed;
-    packet >> base >> dir >> speed >> angle_speed;
-    block = MovableBlock(base, dir, speed, angle_speed);
+    packet >> (Block&)block >> block.dir >> block.speed >> block.angle_speed;
     return packet;
 }
 
 sf::Packet& operator<<(sf::Packet &packet, MovableBlock &block) {
-    Block base(block.cords, block.size, block.id, block.angle);
-    packet << base << block.dir << block.speed << block.angle_speed;
+    packet << (Block&)block << block.dir << block.speed << block.angle_speed;
     return packet;
 }

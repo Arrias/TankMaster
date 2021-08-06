@@ -7,7 +7,7 @@ using namespace sf;
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
-const int FPS = 60, RPS = 60;
+const int FPS = 40;
 IpAddress IP = IpAddress::getLocalAddress();
 int PORT = 2000;
 
@@ -19,7 +19,7 @@ void MultiplayerGame::active() {
     sf::TcpSocket socket;
 
     if (socket.connect(IP, PORT) == sf::Socket::Status::Done) {
-        sf::Clock rps_clock, fps_clock;
+        sf::Clock fps_clock;
         bool moveForward = false, moveRight = false, moveLeft = false, moveBack = false;
 
         while (window.isOpen()) {
@@ -51,16 +51,16 @@ void MultiplayerGame::active() {
                 }
             }
 
-            if (rps_clock.getElapsedTime().asMilliseconds() >= 1000 / RPS) { //SEND USER INPUT
-                rps_clock.restart();
-                sf::Packet packet;
-                packet << moveRight << moveLeft << moveBack << moveForward;
-                socket.send(packet);
-            }
-
-            if (fps_clock.getElapsedTime().asMilliseconds() >= 1000 / FPS) { //RECEIVE GAME AND REDRAW
+            if (fps_clock.getElapsedTime().asMilliseconds() >= 1000 / FPS) {
                 fps_clock.restart();
-                sf::Packet packet;
+
+                if(moveRight || moveLeft || moveBack || moveForward) {
+                    sf::Packet packet; //SEND USER INPUT
+                    packet << moveRight << moveLeft << moveBack << moveForward;
+                    socket.send(packet);
+                }
+
+                sf::Packet packet; //RECEIVE GAME AND REDRAW
                 if (socket.receive(packet) == sf::Socket::Status::Done)
                     packet >> game;
 
