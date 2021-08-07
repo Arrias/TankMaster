@@ -67,7 +67,7 @@ struct TankController {
 
     void move(float lambda) {
         if (moveDown) {
-            game->move_movable_object(tank, lambda * -tank->get_speed(), tank->get_dir());
+            game->move_movable_object(tank, lambda * tank->get_speed(), tank->get_dir() * -1);
         }
         if (moveUp) {
             game->move_movable_object(tank, lambda * tank->get_speed(), tank->get_dir());

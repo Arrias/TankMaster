@@ -156,43 +156,49 @@ float Game::get_max_safe_dist_to_rotate(MovableBlock *block_to_rotate, float saf
     return safe;
 }
 
+const float crash_shift = 0.1;
+const float limit_angle = 10;
+
 void Game::move_movable_object(MovableBlock *block_to_move, float dist, Vector dir) {
-    safe_move(block_to_move, dist, dir);
-    block_to_move->move(eps, dir);
 
-    float add_angle = 0;
-    bool crashed = false;
+    auto update = [&block_to_move](Block *block) {
+        if (get_blocks_intersection(block_to_move, block).type == INTERSECTION_TYPE::NO_INTERSECTIONS) return 0.f;
 
-    auto update = [&add_angle, &crashed, &block_to_move](Block *block) {
-        if (get_blocks_intersection(block_to_move, block).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
-            crashed = true;
+        auto bad_seg = get_bad_segments(block_to_move, block)[0];
+        float angle = (bad_seg.p2 - bad_seg.p1).angle_angle_between(block_to_move->get_dir());
 
-            auto bad_seg = get_bad_segments(block_to_move, block)[0];
-            float angle = (bad_seg.p2 - bad_seg.p1).angle_angle_between(block_to_move->get_dir());
-            float sign = 1;
+        float sign = 1;
 
-            if ((0 <= angle && angle < 90) || (angle < -90)) {
+        if (is_into(0., 90. - limit_angle, angle) || is_into(90., 90. + limit_angle, angle)) {
+            sign *= -1;
+        } else {
+            if (is_into(-90., -90. + limit_angle, angle) || angle < -90. - limit_angle) {
                 sign *= -1;
             }
-
-            add_angle += sign * block_to_move->get_angle_speed();
         }
+
+        return sign * block_to_move->get_angle_speed();
     };
 
-    for (auto block : Game::blocks) {
-        update(block.get());
-    }
+    float was_moved = safe_move(block_to_move, dist, dir);
 
-    for (auto other_tank : Game::tanks) {
-        if (other_tank->get_id() != block_to_move->get_id()) {
-            update(other_tank.get());
+    if (!is_equal(was_moved, dist)) { // crashed
+        block_to_move->move(crash_shift, dir);
+        float add_angle = 0;
+        for (auto block : blocks) {
+            if (block->get_id() != block_to_move->get_id()) {
+                add_angle += update(block.get());
+            }
         }
-    }
-
-    if (crashed) {
-        block_to_move->move(-eps, dir);
+        for (auto tank : tanks) {
+            if (tank->get_id() != block_to_move->get_id()) {
+                add_angle += update(tank.get());
+            }
+        }
+        block_to_move->move(-crash_shift, dir);
         rotate_movable_object(block_to_move, 5 * add_angle, 2 * block_to_move->get_speed(), 2 * add_angle);
     }
+
 }
 
 void Game::rotate_movable_object(MovableBlock *block_to_rotate, float add_angle, float safe_dist, float safe_add_angle) {
@@ -213,7 +219,9 @@ void Game::rotate_movable_object(MovableBlock *block_to_rotate, float add_angle,
     };
 
     for (auto block : blocks) {
-        update(block.get());
+        if (block->get_id() != block_to_rotate->get_id()) {
+            update(block.get());
+        }
     }
 
     for (auto other_tank : tanks) {
