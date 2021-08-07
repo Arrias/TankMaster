@@ -23,8 +23,6 @@ add_executable(TankMaster main/TankMaster.cpp
 target_link_libraries(TankMaster sfml-graphics sfml-audio)
 
 find_package( Threads )
-add_executable(Registry registry/main.cpp mongoose/mongoose.cpp mongoose/mongoose.h web/User/User.cpp web/User/User.h)
-target_link_libraries( Registry ${CMAKE_THREAD_LIBS_INIT} )
-target_link_libraries(Registry sfml-graphics sfml-audio)
-
-add_executable(TestWs registry/test_ws.cpp mongoose/mongoose.cpp mongoose/mongoose.h)
+add_executable(registry registry/server.cpp mongoose/mongoose.cpp mongoose/mongoose.h registry/Room/Room.cpp registry/Room/Room.h)
+target_link_libraries( registry ${CMAKE_THREAD_LIBS_INIT} )
+target_link_libraries(registry sfml-graphics sfml-audio)

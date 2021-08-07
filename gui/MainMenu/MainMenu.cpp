@@ -44,18 +44,26 @@ void MainMenu::make_menu(RenderWindow &window) {
 }
 
 void MainMenu::active() {
-    RenderWindow window(VideoMode(WINDOWS_CONSTS::MAIN_MENU::WIDTH, WINDOWS_CONSTS::MAIN_MENU::HEIGHT), GAME_CONSTS::NAME);
+    RenderWindow window(VideoMode(WINDOWS_CONSTS::MAIN_MENU::WIDTH, WINDOWS_CONSTS::MAIN_MENU::HEIGHT), GAME_CONSTS::NAME,
+                        Style::Close | Style::Titlebar);
     window.setFramerateLimit(FPS_LIMIT);
 
     auto &nav_ref = nav;
     auto txt_loader = texture_loader;
 
-    buttons[0].setCallback([&window, &nav_ref, &txt_loader]() {
+    // buttons = {single game, add room, all rooms, exit}
+
+    auto &single_game_button = buttons[0];
+    auto &add_room_button = buttons[1];
+    auto &join_room_button = buttons[2];
+    auto &exit_button = buttons[3];
+
+    single_game_button.setCallback([&window, &nav_ref, &txt_loader]() {
         window.close();
         nav_ref->push_back(shared_ptr<Window>(new SingleGame(nav_ref, txt_loader)));
     });
 
-    buttons.back().setCallback([&window, &nav_ref]() { // Exit button
+    exit_button.setCallback([&window, &nav_ref]() {
         window.close();
         nav_ref->clear();
     });
