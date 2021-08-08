@@ -183,11 +183,12 @@ void SingleGame::active() {
 
         t1.move(lambda);
         t2.move(lambda);
-        game.move_bullets(lambda);
 
         window.clear(Color(0, 0, 0));
         game_drawer.draw_game(window);
         window.display();
+
+        game.move_bullets(lambda);
     }
 }
 
