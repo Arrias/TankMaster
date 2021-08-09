@@ -7,30 +7,27 @@
 #include <string>
 #include "../Button/Button.h"
 #include "../SingleGame/SingleGame.h"
-#include <iostream>
+#include "../Registry/Registry.h"
+#include "consts.h"
 
-using namespace sf;
-using namespace std;
+using std::vector;
+using std::string;
+using sf::RenderWindow;
+using sf::Sprite;
+using sf::Text;
+using sf::Color;
+using sf::VideoMode;
 
-const string path_to_font = "../fonts/ALoveOfThunder/A Love of Thunder.ttf";
-const size_t menu_floor_type = 5;
-const size_t title_letter_size = 100;
-const size_t buttons_letter_size = 24;
-const size_t button_margin = 50;
-Vector title_pos = Vector(WINDOWS_CONSTS::MAIN_MENU::WIDTH / 2., WINDOWS_CONSTS::MAIN_MENU::HEIGHT / 8.);
-Vector button_size = {250, 35};
-
-Font font;
 vector<Button> buttons;
 
 void MainMenu::make_menu(RenderWindow &window) {
-    auto floor_texture = texture_loader->load_texture("floors", menu_floor_type);
+    auto floor_texture = pars.texture_loader->load_item("floors", menu_floor_type);
     Sprite floor(*floor_texture);
     window.draw(floor);
 
     Text title;
     title.setString(GAME_CONSTS::NAME);
-    title.setFont(font);
+    title.setFont(*pars.font_loader->load_item(path_to_font));
     title.setFillColor(Color(0, 0, 0));
     title.setCharacterSize(title_letter_size);
     auto textSizes = title.getGlobalBounds();
@@ -43,13 +40,9 @@ void MainMenu::make_menu(RenderWindow &window) {
     }
 }
 
-void MainMenu::active() {
-    RenderWindow window(VideoMode(WINDOWS_CONSTS::MAIN_MENU::WIDTH, WINDOWS_CONSTS::MAIN_MENU::HEIGHT), GAME_CONSTS::NAME,
-                        Style::Close | Style::Titlebar);
+void MainMenu::show() {
+    RenderWindow window(VideoMode(MAIN_MENU::WIDTH, MAIN_MENU::HEIGHT), GAME_CONSTS::NAME, sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(FPS_LIMIT);
-
-    auto &nav_ref = nav;
-    auto txt_loader = texture_loader;
 
     // buttons = {single game, add room, all rooms, exit}
 
@@ -58,28 +51,25 @@ void MainMenu::active() {
     auto &join_room_button = buttons[2];
     auto &exit_button = buttons[3];
 
-    single_game_button.setCallback([&window, &nav_ref, &txt_loader]() {
+    single_game_button.setCallback([&window, this]() {
         window.close();
-        nav_ref->push_back(shared_ptr<Window>(new SingleGame(nav_ref, txt_loader)));
+        pars.nav->push_back(shared_ptr<Window>(new SingleGame(Window(pars))));
     });
 
-    exit_button.setCallback([&window, &nav_ref]() {
+    join_room_button.setCallback([&window, this]() {
         window.close();
-        nav_ref->clear();
+        pars.nav->push_back(shared_ptr<Window>(new Registry(Window(pars))));
     });
 
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) {
-                window.close();
-                nav->clear();
-                break;
-            }
-        }
-        if (Mouse::isButtonPressed(Mouse::Left)) {
-            auto mouseX = Mouse::getPosition(window).x;
-            auto mouseY = Mouse::getPosition(window).y;
+    exit_button.setCallback([&window, this]() {
+        window.close();
+        pars.nav->clear();
+    });
+
+    active([ ](sf::Event e) {}, [&window, this]() {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            auto mouseX = sf::Mouse::getPosition(window).x;
+            auto mouseY = sf::Mouse::getPosition(window).y;
             for (auto &button : buttons) {
                 if (point_in_block(Vector(mouseX, mouseY), &button)) {
                     button.click();
@@ -89,20 +79,18 @@ void MainMenu::active() {
         window.clear(Color(0, 0, 0));
         make_menu(window);
         window.display();
-    }
+    }, window);
 }
 
-MainMenu::MainMenu(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader) : Window(nav, texture_loader) {
-    font.loadFromFile(path_to_font);
+MainMenu::MainMenu(Window base) : Window(base) {
+    auto button_texture = pars.texture_loader->load_item("buttons", 1);
+    auto active_button_texture = pars.texture_loader->load_item("buttons", 2);
 
-    auto button_texture = texture_loader->load_texture("buttons", 1);
-    auto active_button_texture = texture_loader->load_texture("buttons", 2);
-
-    auto getButtonText = [ ](string title) {
+    auto get_button_with_text = [this](string title) {
         Text text;
         text.setString(title);
         text.setFillColor(Color(0, 0, 0));
-        text.setFont(font);
+        text.setFont(*pars.font_loader->load_item(path_to_font));
         text.setCharacterSize(buttons_letter_size);
         return text;
     };
@@ -110,15 +98,16 @@ MainMenu::MainMenu(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loade
     buttons = {
             Button(Block(Vector(title_pos.x, title_pos.y + button_margin * 3),
                          button_size, 0, 0),
-                   button_texture, active_button_texture, getButtonText("Single Game")),
+                   button_texture, active_button_texture, get_button_with_text("Single Game")),
             Button(Block(Vector(title_pos.x, title_pos.y + button_margin * 4),
                          button_size, 0, 0),
-                   button_texture, active_button_texture, getButtonText("Add Room")),
+                   button_texture, active_button_texture, get_button_with_text("Add Room")),
             Button(Block(Vector(title_pos.x, title_pos.y + button_margin * 5),
                          button_size, 0, 0),
-                   button_texture, active_button_texture, getButtonText("Join room")),
+                   button_texture, active_button_texture, get_button_with_text("Join room")),
             Button(Block(Vector(title_pos.x, title_pos.y + button_margin * 6),
                          button_size, 0, 0),
-                   button_texture, active_button_texture, getButtonText("Exit")),
+                   button_texture, active_button_texture, get_button_with_text("Exit")),
     };
 }
+

@@ -13,7 +13,7 @@ struct Vector {
 
     Vector(sf::Vector2f vec);
 
-    sf::Vector2f to_sfml_vector();
+    sf::Vector2f to_sfml_vector() const;
 
     float scalar_prod(Vector oth);
 

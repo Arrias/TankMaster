@@ -5,6 +5,7 @@
 #include "SingleGame.h"
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include <chrono>
+#include "consts.h"
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
@@ -125,18 +126,18 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
     int wall_id7 = get_new_id();
     game_drawer.set_texture_num(wall_id7, 1);
 
-    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
-                                               Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), wall_id1, 0)));
+    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
+                                               Vector(wall_thick, SINGLE_GAME::HEIGHT), wall_id1, 0)));
     game.add_block(shared_ptr<Block>(
-            new Block(Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH - wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
-                      Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT),
+            new Block(Vector(SINGLE_GAME::WIDTH - wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
+                      Vector(wall_thick, SINGLE_GAME::HEIGHT),
                       wall_id2, 0)));
 
-    game.add_block(shared_ptr<Block>(new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, wall_thick / 2),
-                                               Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
+    game.add_block(shared_ptr<Block>(new Block(Vector((float) SINGLE_GAME::WIDTH / 2, wall_thick / 2),
+                                               Vector(SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
     game.add_block(shared_ptr<Block>(
-            new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT - wall_thick / 2),
-                      Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick),
+            new Block(Vector((float) SINGLE_GAME::WIDTH / 2, SINGLE_GAME::HEIGHT - wall_thick / 2),
+                      Vector(SINGLE_GAME::WIDTH, wall_thick),
                       wall_id4, 0)));
 
     // Add sample obstacles
@@ -154,33 +155,25 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
 
 }
 
-void SingleGame::active() {
-    RenderWindow window(VideoMode(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
+void SingleGame::show() {
+    RenderWindow window(VideoMode(SINGLE_GAME::WIDTH, SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
     window.setFramerateLimit(FPS_LIMIT);
 
     Game game;
-    GameDrawer game_drawer(&game, floor_type, texture_loader);
+    GameDrawer game_drawer(&game, floor_type, pars.texture_loader);
     sample_game_init(game, game_drawer);
 
     TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down, Keyboard::G);
     TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S, Keyboard::F);
 
-    auto global_time = std::chrono::high_resolution_clock().now();
+    sf::Clock clock;
 
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) { // LEAVE TANKS
-                window.close();
-                nav->clear();
-                break;
-            }
-            t1.update(event);
-            t2.update(event);
-        }
-        auto current_time = std::chrono::high_resolution_clock().now();
-        auto lambda = (current_time - global_time).count() / 1e6;
-        global_time = current_time;
+    active([&t1, &t2](sf::Event event) {
+        t1.update(event);
+        t2.update(event);
+    }, [&clock, &window, &t1, &t2, &game_drawer, &game]() {
+        float lambda = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
 
         t1.move(lambda);
         t2.move(lambda);
@@ -190,11 +183,10 @@ void SingleGame::active() {
         window.display();
 
         game.move_bullets(lambda);
-    }
+    }, window);
 }
 
-SingleGame::SingleGame(std::vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader) : Window(nav, texture_loader) {}
-
+SingleGame::SingleGame(Window base) : Window(base) {}
 
 
 

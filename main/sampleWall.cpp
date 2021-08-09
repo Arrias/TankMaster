@@ -2,12 +2,12 @@
 //#include <iostream>
 //#include "../engine/entities/Tank/Tank.h"
 //#include "../gui/constants.h"
-//#include "../gui/TextureLoader/TextureLoader.h"
+//#include "../gui/Loader/Loader.h"
 //
 //using namespace sf;
 //using namespace std;
 //
-//TextureLoader txt;
+//Loader txt;
 //
 //sf::Sprite paintTank(Tank& a) {
 //	Sprite sprite(txt.load_texture(getPathToTexture("tank", 1)));

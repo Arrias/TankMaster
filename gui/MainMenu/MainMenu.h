@@ -6,9 +6,9 @@
 #include "../Window/Window.h"
 
 struct MainMenu : public Window {
-    MainMenu(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader);
+    MainMenu(Window base);
 
-    void active() override;
+    void show() override;
 
 private:
     void make_menu(sf::RenderWindow &window);

@@ -1,8 +1,6 @@
 #include "Game.h"
 #include <cassert>
 #include <iostream>
-#include <iomanip>
-#include "../../gui/constants.h"
 
 void Game::add_block(shared_ptr<Block> a) {
     blocks.push_back(a);
@@ -25,24 +23,12 @@ void Game::move_bullets(float lambda) {
     for (auto bullet : bullets) {
         float dist = bullet->get_speed() * lambda;
 
-        // otlagivaemsya
-        //std::cout<<"pered while (is_greater(dist, eps))"<<'\n';
-        //
         bool IS_HIT = false;
         while (is_greater(dist, eps)) {
-            // otlagivaemsya
-            //std::cout<<std::fixed<<std::setprecision(10)<<"v whilike s 'distom'="<<dist<<'\n';
-            //
             dist -= safe_move(bullet.get(), dist, bullet->get_dir());
-            // otlagivaemsya
-            //std::cout<<std::fixed<<std::setprecision(10)<<"v whilike no teper 'dist'="<<dist<<'\n';
-            //
 
             if (is_greater(dist, eps)) {
-                // otlagivaemsya
-                //std::cout<<"vnutri if_(is_greater(dist, eps))"<<'\n';
-                //
-                bullet->move(10*eps, bullet->get_dir());
+                bullet->move(10 * eps, bullet->get_dir());
 
                 for (auto tank : Game::tanks) {
                     if (get_blocks_intersection(bullet.get(), tank.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
@@ -51,9 +37,7 @@ void Game::move_bullets(float lambda) {
                         break;
                     }
                 }
-                // otlagivaemsya
-                //std::cout<<"IS_HIT "<<IS_HIT<<'\n';
-                //
+
                 if (IS_HIT) break;
 
                 Vector new_dir = Vector(0, 0);
@@ -87,16 +71,7 @@ void Game::move_bullets(float lambda) {
                     }
                 }
 
-                // otlagivaemsya
-                //std::cout<<"budem rotate delat'"<<'\n';
-                //
-                // otlagivaemsya
-                //std::cout<<"amount "<<amount<<'\n';
-                //
-                // otlagivaemsya
-                //std::cout<<"new_dir "<<new_dir.x << " "<<new_dir.y<<'\n';
-                //
-                bullet->move(-10*eps, bullet->get_dir());
+                bullet->move(-10 * eps, bullet->get_dir());
                 if (amount > 1 || !is_greater(new_dir.len(), eps)) {
                     bullet->rotate(180);
                 } else {
@@ -302,7 +277,7 @@ void Game::add_tank(shared_ptr<Tank> a) {
 void Game::shoot(Tank *tank, float bullet_strength) {
     if (tank->ammunition) {
         Vector cords = tank->get_cords(), dir = tank->get_dir();
-        float dist_to_move = tank->get_size().len()/2 + BULLET_CONSTS::HEIGHT + 10 * eps;
+        float dist_to_move = tank->get_size().len() / 2 + BULLET_CONSTS::HEIGHT + 10 * eps;
         cords += dir * dist_to_move; // std::sqrt(dist_to_move * dist_to_move / (dir.x * dir.x + dir.y * dir.y));
 
         auto bullet = shared_ptr<Bullet>(new Bullet(
@@ -330,7 +305,7 @@ void Game::shoot(Tank *tank, float bullet_strength) {
             }
             if (IN_BLOCK) {
                 tank->health -= bullet->get_strength();
-                bullet->move(-dist_to_move+tank->get_size().y/2-10*eps,bullet->get_dir());
+                bullet->move(-dist_to_move + tank->get_size().y / 2 - 10 * eps, bullet->get_dir());
             }
             add_bullet(bullet);
         }

@@ -5,7 +5,7 @@ Vector::Vector(float x, float y) : x(x), y(y) {}
 
 Vector::Vector(sf::Vector2f vec) : x(vec.x), y(vec.y) {}
 
-sf::Vector2f Vector::to_sfml_vector() {
+sf::Vector2f Vector::to_sfml_vector() const {
     return sf::Vector2f(x, y);
 }
 
