@@ -3,5 +3,22 @@
 //
 
 #include "Window.h"
+#include <iostream>
+void Window::show() {}
 
-Window::Window(std::vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader) : nav(nav), texture_loader(texture_loader) {}
+void Window::active(const std::function<void(sf::Event)> &process_event, const std::function<void()> &update, sf::Window &active_window) {
+    while (active_window.isOpen()) {
+        sf::Event event;
+        while (active_window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                active_window.close();
+                pars.nav->clear();
+                break;
+            }
+            process_event(event);
+        }
+        update();
+    }
+}
+
+Window::Window(Window::Parameters pars) : pars(pars) {}

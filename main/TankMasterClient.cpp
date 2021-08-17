@@ -1,17 +1,21 @@
-#include <SFML/Network.hpp>
-#include "../gui/MultiplayerGame/MultiplayerGame.h"
-#include <memory>
+#include "../gui/SingleGame/SingleGame.h"
+#include "../gui/MainMenu/MainMenu.h"
 
-using namespace std; // WTF DUDE?
+/*
+ * Pass to arguments address of registry
+*/
 
-int main() {
-
-    TextureLoader texture_loader;
+int main(int argc, char *argv[]) {
+    // Initialize parameters
+    Loader<sf::Texture> texture_loader;
+    Loader<sf::Font> font_loader;
     std::vector<shared_ptr<Window>> nav;
-    nav.push_back(shared_ptr<Window>(new MultiplayerGame(&nav, &texture_loader)));
+    std::string registry_address = (argc > 1) ? argv[1] : "";
+    std::string registry_port = (argc > 2) ? argv[2] : "";
 
-    while (!nav.empty()) {
-        nav.back()->active();
+    nav.push_back(shared_ptr<Window>(new MainMenu(Window({&nav, &texture_loader, &font_loader, {registry_address, registry_port}}))));
+    while (nav.size()) {
+        nav.back()->show();
     }
-	return 0;
+    return 0;
 }

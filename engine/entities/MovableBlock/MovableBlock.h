@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../Block/Block.h"
 #include <SFML/Network.hpp>
+#include "../Block/Block.h"
 
 class MovableBlock : public Block {
 protected:
     float speed;
+    float angle;
     float angle_speed;
     Vector dir;
 public:
@@ -25,6 +26,3 @@ public:
     friend sf::Packet& operator>>(sf::Packet &packet, MovableBlock &block);
     friend sf::Packet& operator<<(sf::Packet &packet, MovableBlock &block);
 };
-
-sf::Packet& operator>>(sf::Packet &packet, MovableBlock &block);
-sf::Packet& operator<<(sf::Packet &packet, MovableBlock &block);

@@ -1,13 +1,14 @@
+
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+#include <SFML/Graphics.hpp>
 #include "../constants.h"
 
 struct Vector {
     float x, y;
 
-    float len() const;
+    float len();
 
     Vector(float x = 0, float y = 0);
 
@@ -15,17 +16,17 @@ struct Vector {
 
     sf::Vector2f to_sfml_vector() const;
 
-    float scalar_prod(Vector oth) const;
+    float scalar_prod(Vector oth);
 
-    float vec_prod(Vector oth) const;
+    float vec_prod(Vector oth);
 
-    Vector normalize() const;
+    Vector normalize();
 
-    float polar() const;
+    float polar();
 
-    float angle_angle_between(Vector oth) const;
+    float angle_angle_between(Vector oth);
 
-    Vector rotate(float angle) const;
+    Vector rotate(float angle);
 
     bool operator==(Vector oth);
 
@@ -45,5 +46,3 @@ struct Vector {
     friend sf::Packet& operator<< (sf::Packet &packet, Vector &v);
 };
 
-sf::Packet& operator>> (sf::Packet &packet, Vector &v);
-sf::Packet& operator<< (sf::Packet &packet, Vector &v);
