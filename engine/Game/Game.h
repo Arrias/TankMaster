@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <SFML/Network.hpp>
 #include "../entities/Tank/Tank.h"
@@ -15,14 +14,18 @@ class Game {
     vector<shared_ptr<Tank>> tanks;
     vector<shared_ptr<Bullet>> bullets;
 
-    void safe_move(int id, float dist, Vector dir);
+    float get_max_safe_dist_to_move(MovableBlock *block_to_move, float safe, Vector dir);
 
-    void safe_rotate(int id, float add_angle);
+    float get_max_safe_dist_to_rotate(MovableBlock *block_to_move, float safe);
+
+    float safe_move(MovableBlock *block_to_move, float dist, Vector dir);
+
+    float safe_rotate(MovableBlock *block_to_rotate, float add_angle);
 
 public:
     void add_block(shared_ptr<Block> a);
 
-    shared_ptr<Tank> add_tank(shared_ptr<Tank> a);
+    void add_tank(shared_ptr<Tank> a);
 
     void add_bullet(shared_ptr<Bullet> a);
 
@@ -34,17 +37,18 @@ public:
 
     void move_bullets(float lambda);
 
-    void move_tank(int id, float dist, Vector dir);
+    void move_movable_object(MovableBlock *block_to_move, float dist, Vector dir);
 
-    void rotate_tank(int id, float add_angle);
+    void rotate_movable_object(MovableBlock *block_to_rotate, float add_angle, float safe_dist, float safe_add_angle);
 
     Block *get_block(int id);
 
     Tank *get_tank(int id);
 
+    void shoot(Tank *tank, float bullet_strength);
+
     friend sf::Packet operator>>(sf::Packet &packet, Game &game);
     friend sf::Packet operator<<(sf::Packet &packet, Game &game);
-};
 
-sf::Packet operator>>(sf::Packet &packet, Game &game);
-sf::Packet operator<<(sf::Packet &packet, Game &game);
+    bool is_active();
+};

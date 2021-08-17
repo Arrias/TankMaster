@@ -6,6 +6,11 @@
 #include "../Window/Window.h"
 
 struct MainMenu : public Window {
-    void active() override;
+    MainMenu(Window base);
+
+    void show() override;
+
+private:
+    void make_menu(sf::RenderWindow &window);
 };
 

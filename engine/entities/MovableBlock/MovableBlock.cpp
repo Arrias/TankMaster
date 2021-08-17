@@ -1,19 +1,18 @@
 #include "MovableBlock.h"
-#include <utility>
 
 void MovableBlock::move(float dist, Vector moveDir) {
     cords += moveDir * dist;
 }
 
 float MovableBlock::get_speed() const {
-    return speed;
+	return speed;
 }
 
 Vector MovableBlock::get_dir() {
     return dir;
 }
 
-MovableBlock::MovableBlock(Block base, Vector dir, float speed, float angle_speed) : Block(std::move(base)), dir(dir), speed(speed),
+MovableBlock::MovableBlock(Block base, Vector dir, float speed, float angle_speed) : Block(base), dir(dir), speed(speed),
                                                                                      angle_speed(angle_speed) {}
 
 void MovableBlock::rotate(float add_angle) {

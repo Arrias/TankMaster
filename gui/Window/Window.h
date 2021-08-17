@@ -5,19 +5,28 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "../TextureLoader/TextureLoader.h"
+#include "../Loader/Loader.h"
+#include "../../util/IpAddress/IpAddress.h"
 #include <memory>
 
 using std::shared_ptr;
 using std::vector;
 
 struct Window {
-    vector<shared_ptr<Window>> *nav;
-    TextureLoader *texture_loader;
+    struct Parameters {
+        vector<shared_ptr<Window>> *nav;
+        Loader<sf::Texture> *texture_loader;
+        Loader<sf::Font> *font_loader;
+        IpAddress registry_ip;
+    };
 
-    Window(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader);
+    Parameters pars;
 
-    virtual void active() = 0;
+    Window(Parameters pars);
+
+    virtual void show();
+
+    void active(const std::function<void(sf::Event e)> &process_event, const std::function<void()> &update, sf::Window &active_window);
 
     virtual ~Window() = default;
 };

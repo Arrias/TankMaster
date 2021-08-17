@@ -1,4 +1,6 @@
 #include "Block.h"
+#include <iostream> // for debug
+#include <iomanip>
 #include <set>
 
 Block::Block(Vector cords, Vector size, int id, float angle) : cords(cords), size(size), id(id),
@@ -35,19 +37,19 @@ std::vector<Vector> get_block_points(Block *block) {
         points[i] = points[i].rotate(block->get_angle());
         points[i] += block->cords;
     }
-    return points;
+    return points; //точки идут в порядке обхода против часовой стрелки
 }
 
 bool point_in_block(Vector point, Block *block) {
     std::vector<Vector> points = get_block_points(block);
-    std::set<bool> order;
+    float sum = 0;
     for (int i = 0; i < 4; ++i) {
         int nxt = (i + 1) % 4;
-        Vector a = points[nxt] - points[i];
-        Vector b = point - points[i];
-        order.insert(is_greater(a.vec_prod(b), 0));
+        Vector a = points[i] - point;
+        Vector b = points[nxt] - point;
+        sum += fabs(a.vec_prod(b));
     }
-    return (order.size() == 1);
+    return is_equal(sum, 2 * block->get_size().x * block->get_size().y);
 }
 
 Intersection get_blocks_intersection(Block *a, Block *b) {
@@ -79,12 +81,11 @@ std::vector<Segment> get_bad_segments(Block *a, Block *b) {
 
     for (int i = 0; i < 4; ++i) {
         int nxt = (i + 1) % 4;
-        segments1[i] = {points1[i], points1[nxt]};
-        segments2[i] = {points2[i], points2[nxt]};
+        segments1[i] = { points1[i], points1[nxt] };
+        segments2[i] = { points2[i], points2[nxt] };
     }
 
     std::vector<Segment> bad_segments;
-
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
             if (segments1[j].get_intersection(segments2[i]).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
