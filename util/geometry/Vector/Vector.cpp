@@ -5,7 +5,7 @@ Vector::Vector(float x, float y) : x(x), y(y) {}
 
 Vector::Vector(sf::Vector2f vec) : x(vec.x), y(vec.y) {}
 
-sf::Vector2f Vector::to_sfml_vector() {
+sf::Vector2f Vector::to_sfml_vector() const {
     return sf::Vector2f(x, y);
 }
 
@@ -76,4 +76,14 @@ float Vector::angle_angle_between(Vector oth) {
     else if (res < -PI)
         res += 2 * PI;
     return rad_to_deg(-res);
+}
+
+sf::Packet& operator>> (sf::Packet &packet, Vector &v) {
+    packet >> v.x >> v.y;
+    return packet;
+}
+
+sf::Packet& operator<< (sf::Packet &packet, Vector &v) {
+    packet << v.x << v.y;
+    return packet;
 }

@@ -1,7 +1,13 @@
 #include "Tank.h"
 
-Tank::Tank(MovableBlock base, float health) : MovableBlock(base), health(health) {}
-
-float Tank::get_health() const {
-    return health;
+sf::Packet& operator>>(sf::Packet &packet, Tank &tank) {
+    packet >> (MovableBlock&)tank >> tank.health;
+    return packet;
 }
+
+sf::Packet& operator<<(sf::Packet &packet, Tank &tank) {
+    packet << (MovableBlock&)tank << tank.health;
+    return packet;
+}
+
+Tank::Tank(MovableBlock base, float health) : MovableBlock(base), health(health) {}

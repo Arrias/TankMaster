@@ -5,6 +5,7 @@
 #include "SingleGame.h"
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include <chrono>
+#include "consts.h"
 
 const float wall_thick = 50;
 const size_t floor_type = 3;
@@ -14,14 +15,16 @@ using namespace sf;
 struct TankController {
     Tank *tank;
     Game *game;
-    sf::Keyboard::Key left, right, up, down;
+    sf::Keyboard::Key left, right, up, down, fire;
 
-    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down) : tank(tank),
-                                                                                                                            game(game),
-                                                                                                                            left(left),
-                                                                                                                            right(right),
-                                                                                                                            up(up),
-                                                                                                                            down(down) {}
+    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down,
+                   Keyboard::Key fire) : tank(tank),
+                                         game(game),
+                                         left(left),
+                                         right(right),
+                                         up(up),
+                                         down(down),
+                                         fire(fire) {}
 
     bool moveUp = false;
     bool moveLeft = false;
@@ -30,6 +33,11 @@ struct TankController {
 
     void update(Event &e) {
         if (e.type == Event::KeyPressed) {
+            //
+            if (e.key.code == fire) {
+                game->shoot(tank, 25.0);
+            }
+            //
             if (e.key.code == up) {
                 moveUp = true;
             }
@@ -60,16 +68,18 @@ struct TankController {
 
     void move(float lambda) {
         if (moveDown) {
-            game->move_tank(tank->get_id(), lambda * -tank->get_speed(), tank->get_dir());
+            game->move_movable_object(tank, lambda * tank->get_speed(), tank->get_dir() * -1);
         }
         if (moveUp) {
-            game->move_tank(tank->get_id(), lambda * tank->get_speed(), tank->get_dir());
+            game->move_movable_object(tank, lambda * tank->get_speed(), tank->get_dir());
         }
         if (moveLeft) {
-            game->rotate_tank(tank->get_id(), lambda * -TANK_CONSTS::BASE::ROTATION);
+            game->rotate_movable_object(tank, lambda * -TANK_CONSTS::BASE::ROTATION, tank->get_speed(),
+                                        lambda * -TANK_CONSTS::BASE::ROTATION / 2);
         }
         if (moveRight) {
-            game->rotate_tank(tank->get_id(), lambda * TANK_CONSTS::BASE::ROTATION);
+            game->rotate_movable_object(tank, lambda * TANK_CONSTS::BASE::ROTATION, tank->get_speed(),
+                                        lambda * TANK_CONSTS::BASE::ROTATION / 2);
         }
     }
 };
@@ -116,18 +126,18 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
     int wall_id7 = get_new_id();
     game_drawer.set_texture_num(wall_id7, 1);
 
-    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
-                                               Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), wall_id1, 0)));
+    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
+                                               Vector(wall_thick, SINGLE_GAME::HEIGHT), wall_id1, 0)));
     game.add_block(shared_ptr<Block>(
-            new Block(Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH - wall_thick / 2, (float) WINDOWS_CONSTS::SINGLE_GAME::HEIGHT / 2),
-                      Vector(wall_thick, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT),
+            new Block(Vector(SINGLE_GAME::WIDTH - wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
+                      Vector(wall_thick, SINGLE_GAME::HEIGHT),
                       wall_id2, 0)));
 
-    game.add_block(shared_ptr<Block>(new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, wall_thick / 2),
-                                               Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
+    game.add_block(shared_ptr<Block>(new Block(Vector((float) SINGLE_GAME::WIDTH / 2, wall_thick / 2),
+                                               Vector(SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
     game.add_block(shared_ptr<Block>(
-            new Block(Vector((float) WINDOWS_CONSTS::SINGLE_GAME::WIDTH / 2, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT - wall_thick / 2),
-                      Vector(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, wall_thick),
+            new Block(Vector((float) SINGLE_GAME::WIDTH / 2, SINGLE_GAME::HEIGHT - wall_thick / 2),
+                      Vector(SINGLE_GAME::WIDTH, wall_thick),
                       wall_id4, 0)));
 
     // Add sample obstacles
@@ -139,51 +149,44 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
 
     int bullet_id1 = get_new_id();
     game_drawer.set_texture_num(bullet_id1, 1);
-    //    game.add_bullet(new Bullet(MovableBlock(Block(Vector(100, 100), Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT),
-    //                                                  bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
-    //                               5));
+    //game.add_bullet(std::shared_ptr<Bullet>(new Bullet(MovableBlock(Block(Vector(100, 100), Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT),
+    //                                            bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
+    //                       5)));
 
 }
 
-void SingleGame::active() {
-    RenderWindow window(VideoMode(WINDOWS_CONSTS::SINGLE_GAME::WIDTH, WINDOWS_CONSTS::SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
+void SingleGame::show() {
+    RenderWindow window(VideoMode(SINGLE_GAME::WIDTH, SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
+    window.setFramerateLimit(FPS_LIMIT);
 
     Game game;
-    GameDrawer game_drawer(&game, floor_type, texture_loader);
+    GameDrawer game_drawer(&game, floor_type, pars.texture_loader);
     sample_game_init(game, game_drawer);
 
-    TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down);
-    TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S);
+    TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down, Keyboard::G);
+    TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S, Keyboard::F);
 
-    auto global_time = std::chrono::high_resolution_clock().now();
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) { // LEAVE TANKS
-                window.close();
-                nav->clear();
-                break;
-            }
-            t1.update(event);
-            t2.update(event);
-        }
+    sf::Clock clock;
 
-        auto current_time = std::chrono::high_resolution_clock().now();
-        auto lambda = (current_time - global_time).count() / 1e6;
-        global_time = current_time;
+    active([&t1, &t2](sf::Event event) {
+        t1.update(event);
+        t2.update(event);
+    }, [&clock, &window, &t1, &t2, &game_drawer, &game]() {
+        float lambda = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
 
         t1.move(lambda);
         t2.move(lambda);
-        game.move_bullets(lambda);
 
         window.clear(Color(0, 0, 0));
         game_drawer.draw_game(window);
         window.display();
-    }
+
+        game.move_bullets(lambda);
+    }, window);
 }
 
-SingleGame::SingleGame(std::vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader) : Window(nav, texture_loader) {}
-
+SingleGame::SingleGame(Window base) : Window(base) {}
 
 
 

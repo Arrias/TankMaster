@@ -1,5 +1,5 @@
 #pragma once
-
+#include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
 #include "../../../util/geometry/Segment/Segment.h"
 
@@ -27,7 +27,12 @@ public:
     friend Intersection get_blocks_intersection(Block *a, Block *b);
 
     friend std::vector<Segment> get_bad_segments(Block *a, Block *b);
+
+    friend sf::Packet& operator>> (sf::Packet &packet, Block &block);
+    friend sf::Packet& operator<< (sf::Packet &packet, Block &block);
 };
+
+bool point_in_block(Vector point, Block *block);
 
 std::vector<Vector> get_block_points(Block *a);
 

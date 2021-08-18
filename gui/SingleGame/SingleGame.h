@@ -8,9 +8,9 @@
 #include "../constants.h"
 
 struct SingleGame : public Window {
-    SingleGame(vector<shared_ptr<Window>> *nav, TextureLoader *texture_loader);
+    SingleGame(Window base);
 
-    void active() override;
+    void show() override;
 };
 
 

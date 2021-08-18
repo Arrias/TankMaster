@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
 #include "../constants.h"
 
@@ -13,7 +14,7 @@ struct Vector {
 
     Vector(sf::Vector2f vec);
 
-    sf::Vector2f to_sfml_vector();
+    sf::Vector2f to_sfml_vector() const;
 
     float scalar_prod(Vector oth);
 
@@ -40,5 +41,8 @@ struct Vector {
     void operator-=(Vector oth);
 
     void operator*=(float scalar);
+
+    friend sf::Packet& operator>> (sf::Packet &packet, Vector &v);
+    friend sf::Packet& operator<< (sf::Packet &packet, Vector &v);
 };
 

@@ -2,12 +2,12 @@
 
 #include <SFML/Graphics.hpp>
 #include "../../engine/Game/Game.h"
-#include "../../gui/TextureLoader/TextureLoader.h"
+#include "../../gui/Loader/Loader.h"
 
 class GameDrawer {
     std::map<size_t, size_t> id_to_texture; // map id of block to num of texture
     Game *game;
-    TextureLoader *texture_loader;
+    Loader<sf::Texture> *texture_loader;
 
     void draw_floor(sf::RenderWindow &window);
 
@@ -16,7 +16,7 @@ public:
 
     size_t floor_type;
 
-    GameDrawer(Game *game, size_t floor_type, TextureLoader * texture_loader);
+    GameDrawer(Game *game, size_t floor_type, Loader<sf::Texture> *texture_loader);
 
     void draw_game(sf::RenderWindow &window);
 };

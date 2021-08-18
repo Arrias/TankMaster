@@ -5,7 +5,7 @@ void MovableBlock::move(float dist, Vector moveDir) {
 }
 
 float MovableBlock::get_speed() const {
-    return speed;
+	return speed;
 }
 
 Vector MovableBlock::get_dir() {
@@ -24,3 +24,12 @@ float MovableBlock::get_angle_speed() const {
     return angle_speed;
 }
 
+sf::Packet& operator>>(sf::Packet &packet, MovableBlock &block) {
+    packet >> (Block&)block >> block.dir >> block.speed >> block.angle_speed;
+    return packet;
+}
+
+sf::Packet& operator<<(sf::Packet &packet, MovableBlock &block) {
+    packet << (Block&)block << block.dir << block.speed << block.angle_speed;
+    return packet;
+}
