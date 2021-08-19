@@ -78,6 +78,21 @@ float Vector::angle_angle_between(Vector oth) {
     return rad_to_deg(-res);
 }
 
+bool Vector::deserialize_from_json(const std::string &json) {
+    Document document;
+    document.Parse(json.c_str());
+    return deserialize_from_document(document);
+}
+
+void Vector::serialize(PrettyWriter <StringBuffer> &pw) const {
+    pw.StartObject();
+    pw.Key("x");
+    pw.Double(x);
+    pw.Key("y");
+    pw.Double(y);
+    pw.EndObject();
+}
+
 sf::Packet& operator>> (sf::Packet &packet, Vector &v) {
     packet >> v.x >> v.y;
     return packet;

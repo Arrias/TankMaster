@@ -2,6 +2,7 @@
 #include "../../engine/entities/Tank/Tank.h"
 #include "../../engine/Game/Game.h"
 #include "../../gui/constants.h"
+#include "../../util/Loader/Loader.h"
 
 class TcpGameHost {
 public:

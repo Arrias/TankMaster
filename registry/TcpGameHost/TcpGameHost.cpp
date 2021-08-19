@@ -4,32 +4,13 @@
 const float wall_thick = 50;
 const size_t floor_type = 3;
 
-int id = 0;
-auto get_new_id = []() {
-    return id++;
-};
-
 void sample_game_init(Game &game) {
-    game.add_block(std::make_shared<Block>(Vector(wall_thick / 2, (float) MULTIPLAYER_GAME::HEIGHT / 2),
-                                           Vector(wall_thick, MULTIPLAYER_GAME::HEIGHT), get_new_id(), 0));
-    game.add_block(std::make_shared<Block>(
-            Vector(MULTIPLAYER_GAME::WIDTH - wall_thick / 2,
-                   (float) MULTIPLAYER_GAME::HEIGHT / 2),
-            Vector(wall_thick, MULTIPLAYER_GAME::HEIGHT),
-            get_new_id(), 0));
-    game.add_block(std::make_shared<Block>(Vector((float) MULTIPLAYER_GAME::WIDTH / 2, wall_thick / 2),
-                                           Vector(MULTIPLAYER_GAME::WIDTH, wall_thick), get_new_id(), 0));
-    game.add_block(std::make_shared<Block>(
-            Vector((float) MULTIPLAYER_GAME::WIDTH / 2,
-                   MULTIPLAYER_GAME::HEIGHT - wall_thick / 2),
-            Vector(MULTIPLAYER_GAME::WIDTH, wall_thick),
-            get_new_id(), 0));
-    game.add_block(std::make_shared<Block>(Vector(200, 200), Vector(50, 300), get_new_id(), 35));
-    game.add_block(std::make_shared<Block>(Vector(500, 500), Vector(100, 100), get_new_id(), 45));
-    game.add_block(std::make_shared<Block>(Vector(800, 800), Vector(300, 1000), get_new_id(), 69));
+    Loader<Map> map_loader;
+    Game temp(*map_loader.load_item("../maps/map1.json"));
+    game = temp;
 }
 
-TcpGameHost::TcpGameHost(int port) : game() {
+TcpGameHost::TcpGameHost(int port) : game({}) {
     sample_game_init(game);
     listener.listen(port);
     selector.add(listener);
@@ -103,7 +84,7 @@ void TcpGameHost::wait_players() {
             auto socket = new sf::TcpSocket;
             if (listener.accept(*socket) == sf::Socket::Status::Done) {
                 selector.add(*socket);
-                int player_id = get_new_id();
+                int player_id = game.get_new_id();
                 game.add_tank(std::make_shared<Tank>(MovableBlock(
                         Block(Vector(800, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), player_id,
                               0), Vector(0, 1), TANK_CONSTS::BASE::SPEED, TANK_CONSTS::BASE::ROTATION), 100.0));

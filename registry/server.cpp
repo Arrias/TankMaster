@@ -6,7 +6,8 @@
 #include <iostream>
 
 using std::vector;
-
+using rapidjson::StringBuffer;
+using rapidjson::PrettyWriter;
 vector<Room> rooms;
 vector<shared_ptr<TcpGameHost>> games;
 
@@ -15,8 +16,8 @@ string text_type = "Content-Type: text/html; charset=utf-8\r\n";
 string json_type = "Content-Type: application/json\r\n";
 
 string getRoomsJson() {
-    rapidjson::StringBuffer sb;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    StringBuffer sb;
+    PrettyWriter<rapidjson::StringBuffer> writer(sb);
     writer.StartArray();
     for (auto room : rooms) {
         room.serialize(writer);

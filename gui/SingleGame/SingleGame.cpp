@@ -1,10 +1,7 @@
-//
-// Created by arrias on 31.07.2021.
-//
-
 #include "SingleGame.h"
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include <chrono>
+#include <memory>
 #include "consts.h"
 
 const float wall_thick = 50;
@@ -17,7 +14,8 @@ struct TankController {
     Game *game;
     sf::Keyboard::Key left, right, up, down, fire;
 
-    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up, Keyboard::Key down,
+    TankController(Tank *tank, Game *game, Keyboard::Key left, Keyboard::Key right, Keyboard::Key up,
+                   Keyboard::Key down,
                    Keyboard::Key fire) : tank(tank),
                                          game(game),
                                          left(left),
@@ -85,86 +83,51 @@ struct TankController {
 };
 
 void sample_game_init(Game &game, GameDrawer &game_drawer) {
-    int id = 0;
-    auto get_new_id = [&id]() {
-        return id++;
-    };
+    Loader<Map> map_loader;
+    Map map = *map_loader.load_item("../maps/map1.json");
+    assert(map.get_spawn_points().size() >= 2);
+    Game temp(map);
 
-    // Add tanks
-
-    int tank_id1 = get_new_id();
-    int tank_id2 = get_new_id();
+    int tank_id1 = temp.get_new_id();
+    int tank_id2 = tank_id1 + 1;
 
     game_drawer.set_texture_num(tank_id1, 2);
     game_drawer.set_texture_num(tank_id2, 3);
 
-    game.add_tank(shared_ptr<Tank>(new Tank(
-            MovableBlock(Block(Vector(500, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id1, 0), Vector(0, 1),
+    temp.add_tank(std::make_shared<Tank>(
+            MovableBlock(Block(map.get_spawn_points()[0], Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id1, 0),
+                         Vector(0, 1),
                          TANK_CONSTS::BASE::SPEED,
                          TANK_CONSTS::BASE::ROTATION),
-            100.0)));
+            100.0));
 
-    game.add_tank(shared_ptr<Tank>(new Tank(
-            MovableBlock(Block(Vector(800, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id2, 0), Vector(0, 1),
+    temp.add_tank(std::make_shared<Tank>(
+            MovableBlock(Block(map.get_spawn_points()[1], Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), tank_id2, 0),
+                         Vector(0, 1),
                          TANK_CONSTS::BASE::SPEED,
                          TANK_CONSTS::BASE::ROTATION),
-            100.0)));
+            100.0));
 
-    // Add borders
-    int wall_id1 = get_new_id();
-    game_drawer.set_texture_num(wall_id1, 1); // (!) ADD INITIAL VALUE TO THIS CLASS
-    int wall_id2 = get_new_id();
-    game_drawer.set_texture_num(wall_id2, 1);
-    int wall_id3 = get_new_id();
-    game_drawer.set_texture_num(wall_id3, 1);
-    int wall_id4 = get_new_id();
-    game_drawer.set_texture_num(wall_id4, 1);
-    int wall_id5 = get_new_id();
-    game_drawer.set_texture_num(wall_id5, 1);
-    int wall_id6 = get_new_id();
-    game_drawer.set_texture_num(wall_id6, 1);
-    int wall_id7 = get_new_id();
-    game_drawer.set_texture_num(wall_id7, 1);
-
-    game.add_block(shared_ptr<Block>(new Block(Vector(wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
-                                               Vector(wall_thick, SINGLE_GAME::HEIGHT), wall_id1, 0)));
-    game.add_block(shared_ptr<Block>(
-            new Block(Vector(SINGLE_GAME::WIDTH - wall_thick / 2, (float) SINGLE_GAME::HEIGHT / 2),
-                      Vector(wall_thick, SINGLE_GAME::HEIGHT),
-                      wall_id2, 0)));
-
-    game.add_block(shared_ptr<Block>(new Block(Vector((float) SINGLE_GAME::WIDTH / 2, wall_thick / 2),
-                                               Vector(SINGLE_GAME::WIDTH, wall_thick), wall_id3, 0)));
-    game.add_block(shared_ptr<Block>(
-            new Block(Vector((float) SINGLE_GAME::WIDTH / 2, SINGLE_GAME::HEIGHT - wall_thick / 2),
-                      Vector(SINGLE_GAME::WIDTH, wall_thick),
-                      wall_id4, 0)));
-
-    // Add sample obstacles
-    game.add_block(shared_ptr<Block>(new Block(Vector(200, 200), Vector(50, 300), wall_id5, 35)));
-    game.add_block(shared_ptr<Block>(new Block(Vector(500, 500), Vector(100, 100), wall_id6, 45)));
-    game.add_block(shared_ptr<Block>(new Block(Vector(800, 800), Vector(300, 1000), wall_id7, 69)));
-
-    // Add bullet
-
-    int bullet_id1 = get_new_id();
-    game_drawer.set_texture_num(bullet_id1, 1);
-    //game.add_bullet(std::shared_ptr<Bullet>(new Bullet(MovableBlock(Block(Vector(100, 100), Vector(BULLET_CONSTS::WIDTH, BULLET_CONSTS::HEIGHT),
-    //                                            bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
-    //                       5)));
-
+    for (auto &i : map.get_blocks())
+        game_drawer.set_texture_num(i->get_id(), 1);
+    game = temp;
 }
 
 void SingleGame::show() {
     RenderWindow window(VideoMode(SINGLE_GAME::WIDTH, SINGLE_GAME::HEIGHT), GAME_CONSTS::NAME);
     window.setFramerateLimit(FPS_LIMIT);
 
-    Game game;
-    GameDrawer game_drawer(&game, floor_type, pars.texture_loader);
+    Game game({});
+    GameDrawer game_drawer(floor_type, pars.texture_loader);
     sample_game_init(game, game_drawer);
 
-    TankController t1((Tank *) game.get_tank(0), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down, Keyboard::G);
-    TankController t2((Tank *) game.get_tank(1), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S, Keyboard::F);
+    int tank_id1 = game.get_tanks()[0]->get_id();
+    int tank_id2 = game.get_tanks()[1]->get_id();
+
+    TankController t1((Tank *) game.get_tank(tank_id1), &game, Keyboard::Left, Keyboard::Right, Keyboard::Up, Keyboard::Down,
+                      Keyboard::G);
+    TankController t2((Tank *) game.get_tank(tank_id2), &game, Keyboard::A, Keyboard::D, Keyboard::W, Keyboard::S,
+                      Keyboard::F);
 
     sf::Clock clock;
 
@@ -179,7 +142,7 @@ void SingleGame::show() {
         t2.move(lambda);
 
         window.clear(Color(0, 0, 0));
-        game_drawer.draw_game(window);
+        game_drawer.draw_game(game, window);
         window.display();
 
         game.move_bullets(lambda);

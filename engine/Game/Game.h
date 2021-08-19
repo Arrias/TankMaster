@@ -4,13 +4,15 @@
 #include <SFML/Network.hpp>
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
+#include "../../maps/Map.h"
 #include <memory>
 
 using std::shared_ptr;
 using std::vector;
 
 class Game {
-    vector<shared_ptr<Block>> blocks;
+    int id;
+    Map map;
     vector<shared_ptr<Tank>> tanks;
     vector<shared_ptr<Bullet>> bullets;
 
@@ -23,7 +25,7 @@ class Game {
     float safe_rotate(MovableBlock *block_to_rotate, float add_angle);
 
 public:
-    void add_block(shared_ptr<Block> a);
+    explicit Game(Map map);
 
     void add_tank(shared_ptr<Tank> a);
 
@@ -49,6 +51,8 @@ public:
 
     friend sf::Packet operator>>(sf::Packet &packet, Game &game);
     friend sf::Packet operator<<(sf::Packet &packet, Game &game);
+
+    int get_new_id() const;
 
     bool is_active();
 };

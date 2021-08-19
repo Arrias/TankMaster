@@ -64,8 +64,8 @@ void TcpMultiplayerGame::show() {
     window.setFramerateLimit(FPS_LIMIT);
     window.setKeyRepeatEnabled(false);
 
-    Game game;
-    GameDrawer game_drawer(&game, floor_type, pars.texture_loader);
+    Game game({});
+    GameDrawer game_drawer(floor_type, pars.texture_loader);
 
     TankController1 t(sf::Keyboard::Left, sf::Keyboard::Right, sf::Keyboard::Up,sf::Keyboard::Down, sf::Keyboard::G);
 
@@ -96,7 +96,7 @@ void TcpMultiplayerGame::show() {
                     game_drawer.set_texture_num(i->get_id(), 2);
 
                 window.clear(sf::Color(0, 0, 0));
-                game_drawer.draw_game(window);
+                game_drawer.draw_game(game, window);
                 window.display();
             }
         }

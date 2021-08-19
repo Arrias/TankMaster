@@ -25,8 +25,8 @@ void Registry::draw_rooms(sf::RenderWindow &window, const std::vector<Room> &roo
     Vector but_size = Vector(500, 250);
     int id = 0;
 
-    auto button_texture = pars.texture_loader->load_item("buttons", 1);
-    auto active_button_texture = pars.texture_loader->load_item("buttons", 2);
+    auto button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 1));
+    auto active_button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 2));
 
     for (auto &room : rooms) {
         ++id;

@@ -23,7 +23,7 @@ using sf::VideoMode;
 vector<Button> buttons;
 
 void MainMenu::make_menu(RenderWindow &window) {
-    auto floor_texture = pars.texture_loader->load_item("floors", menu_floor_type);
+    auto floor_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("floors", menu_floor_type));
     Sprite floor(*floor_texture);
     window.draw(floor);
 
@@ -99,8 +99,8 @@ void MainMenu::show() {
 }
 
 MainMenu::MainMenu(Window base) : Window(base) {
-    auto button_texture = pars.texture_loader->load_item("buttons", 1);
-    auto active_button_texture = pars.texture_loader->load_item("buttons", 2);
+    auto button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 1));
+    auto active_button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 2));
 
     auto get_button_with_text = [this](string title) {
         Text text;

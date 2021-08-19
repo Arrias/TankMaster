@@ -8,6 +8,7 @@
 
 using rapidjson::PrettyWriter;
 using rapidjson::StringBuffer;
+using rapidjson::Document;
 
 struct IpAddress {
     std::string host, port;
@@ -45,12 +46,12 @@ struct IpAddress {
     }
 
     bool deserialize_from_json(const std::string &json) {
-        rapidjson::Document document;
+        Document document;
         document.Parse(json.c_str());
         return deserialize_from_document(document);
     }
 
-    void serialize(rapidjson::PrettyWriter<StringBuffer> &pw) const {
+    void serialize(PrettyWriter<StringBuffer> &pw) const {
         pw.StartObject();
         pw.String("host");
         pw.String(host.c_str());

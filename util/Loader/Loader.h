@@ -11,7 +11,7 @@ class Loader {
 
 public:
 
-    static std::string getPathToTexture(std::string entity_type, size_t texture_num) {
+    static std::string get_path_to_texture(std::string entity_type, size_t texture_num) {
         std::stringstream ret;
         ret << "../textures/";
         ret << entity_type;
@@ -27,10 +27,6 @@ public:
             loaded_items[item_path]->loadFromFile(item_path);
         }
         return loaded_items[item_path];
-    }
-
-    T *load_item(std::string entity_type, size_t texture_num) { // now for textures only
-        return load_item(getPathToTexture(entity_type, texture_num));
     }
 
     ~Loader() {

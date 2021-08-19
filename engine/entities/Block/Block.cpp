@@ -1,7 +1,4 @@
 #include "Block.h"
-#include <iostream> // for debug
-#include <iomanip>
-#include <set>
 
 Block::Block(Vector cords, Vector size, int id, float angle) : cords(cords), size(size), id(id),
                                                                angle(angle) {}
@@ -95,6 +92,25 @@ std::vector<Segment> get_bad_segments(Block *a, Block *b) {
         }
     }
     return bad_segments;
+}
+
+bool Block::deserialize_from_json(const std::string &json) {
+    Document document;
+    document.Parse(json.c_str());
+    return deserialize_from_document(document);
+}
+
+void Block::serialize(PrettyWriter <StringBuffer> &pw) const {
+    pw.StartObject();
+    pw.Key("cords");
+    cords.serialize(pw);
+    pw.Key("size");
+    size.serialize(pw);
+    pw.Key("id");
+    pw.Int(id);
+    pw.Key("angle");
+    pw.Double(angle);
+    pw.EndObject();
 }
 
 sf::Packet& operator>> (sf::Packet &packet, Block &block) {
