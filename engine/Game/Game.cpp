@@ -20,6 +20,10 @@ void Game::add_bullet(shared_ptr<Bullet> a) {
     bullets.push_back(a);
 }
 
+void Game::add_booster(std::shared_ptr<Booster> a) {
+    boosters.push_back(a);
+}
+
 void Game::move_bullets(float lambda) {
     vector<shared_ptr<Bullet>> active_bullets;
     for (auto bullet : bullets) {
@@ -287,6 +291,10 @@ const std::vector<shared_ptr<Bullet>> Game::get_bullets() const {
     return bullets;
 }
 
+const std::vector<shared_ptr<Booster>> Game::get_boosters() const {
+    return boosters;
+}
+
 void Game::add_tank(shared_ptr<Tank> a) {
     tanks.push_back(a);
 }
@@ -305,7 +313,7 @@ void Game::shoot(Tank *tank, float bullet_strength) {
         --tank->ammunition;
 
         bool IS_HIT = false;
-        for (auto other_tank : Game::tanks) {
+        for (auto other_tank : tanks) {
             if (get_blocks_intersection(bullet.get(), other_tank.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
                 other_tank->health -= bullet->get_strength();
                 IS_HIT = true;
@@ -314,7 +322,7 @@ void Game::shoot(Tank *tank, float bullet_strength) {
         }
         if (!IS_HIT) {
             bool IN_BLOCK = false;
-            for (auto block : Game::blocks) {
+            for (auto block : blocks) {
                 if (get_blocks_intersection(bullet.get(), block.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
                     IN_BLOCK = true;
                     break;
@@ -327,4 +335,26 @@ void Game::shoot(Tank *tank, float bullet_strength) {
             add_bullet(bullet);
         }
     }
+}
+
+void Game::update_boosters() {
+    vector<shared_ptr<Booster>> active_boosters;
+    for (auto booster : boosters) {
+        bool USED = false;
+        for(auto tank : tanks) {
+            if(get_blocks_intersection(tank.get(),booster.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
+                if(booster->type == BOOSTER_TYPE::AMMO) {
+                    tank->ammunition += 10;
+                }
+                else if(booster->type == BOOSTER_TYPE::HEALTH) {
+                    tank->health += 100.0;
+                }
+                USED = true;
+                break;
+            }
+        }
+        if(!USED)
+            active_boosters.push_back(booster);
+    }
+    boosters = active_boosters;
 }

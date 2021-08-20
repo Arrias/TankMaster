@@ -3,6 +3,7 @@
 #include <vector>
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
+#include "../entities/Booster/Booster.h"
 #include <memory>
 
 using std::shared_ptr;
@@ -10,6 +11,7 @@ using std::vector;
 
 class Game {
     vector<shared_ptr<Block>> blocks;
+    vector<shared_ptr<Booster>> boosters;
     vector<shared_ptr<Tank>> tanks;
     vector<shared_ptr<Bullet>> bullets;
 
@@ -28,11 +30,15 @@ public:
 
     void add_bullet(shared_ptr<Bullet> a);
 
+    void add_booster(std::shared_ptr<Booster> a);
+
     const vector<shared_ptr<Block>> &get_blocks() const;
 
     const vector<shared_ptr<Tank>> get_tanks() const;
 
     const vector<shared_ptr<Bullet>> get_bullets() const;
+
+    const vector<shared_ptr<Booster>> get_boosters() const;
 
     void move_bullets(float lambda);
 
@@ -45,4 +51,6 @@ public:
     Tank *get_tank(int id);
 
     void shoot(Tank *tank, float bullet_strength);
+
+    void update_boosters();
 };

@@ -152,6 +152,15 @@ void sample_game_init(Game &game, GameDrawer &game_drawer) {
     //                                            bullet_id1, 0), Vector(1, 1), BULLET_CONSTS::BASE::SPEED, BULLET_CONSTS::BASE::SPEED),
     //                       5)));
 
+
+    // Add boosters
+
+    int booster_id1 = get_new_id();
+    game_drawer.set_texture_num(booster_id1, 1);
+    int booster_id2 = get_new_id();
+    game_drawer.set_texture_num(booster_id2, 1);
+    game.add_booster(std::shared_ptr<Booster>(new Booster(Block(Vector(1000, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::WIDTH), booster_id1, 0),BOOSTER_TYPE::AMMO)));
+    game.add_booster(std::shared_ptr<Booster>(new Booster(Block(Vector(1500, 300), Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::WIDTH), booster_id2, 0),BOOSTER_TYPE::HEALTH)));
 }
 
 void SingleGame::active() {
@@ -183,6 +192,8 @@ void SingleGame::active() {
 
         t1.move(lambda);
         t2.move(lambda);
+
+        game.update_boosters();
 
         window.clear(Color(0, 0, 0));
         game_drawer.draw_game(window);

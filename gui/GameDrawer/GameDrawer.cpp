@@ -5,6 +5,7 @@ const std::string FLOOR = "floors";
 const std::string TANK = "tanks";
 const std::string WALL = "walls";
 const std::string BULLET = "bullets";
+const std::string BOOSTER = "boosters";
 
 void draw_object(Block *obj, sf::RenderWindow &window, sf::Texture *texture) {
     sf::Sprite sprite(*texture, sf::IntRect(0, 0, obj->get_size().x, obj->get_size().y));
@@ -22,6 +23,10 @@ void GameDrawer::draw_game(sf::RenderWindow &window) {
     for (auto block : game->get_blocks()) {
         auto texture = texture_loader->load_texture(WALL, id_to_texture[block->get_id()]);
         draw_object(block.get(), window, texture);
+    }
+    for (auto booster : game->get_boosters()) {
+        auto texture = texture_loader->load_texture(BOOSTER, id_to_texture[booster->get_id()]);
+        draw_object(booster.get(), window, texture);
     }
 
     for (auto tank : game->get_tanks()) {

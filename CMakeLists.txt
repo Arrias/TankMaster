@@ -18,6 +18,6 @@ add_executable(TankMaster main/TankMaster.cpp
         util/geometry/general_functions/general_functions.cpp  util/geometry/general_functions/general_functions.h
         util/geometry/Segment/Segment.cpp util/geometry/Segment/Segment.h
         util/geometry/Line/Line.cpp util/geometry/Line/Line.h
-        gui/Button/Button.cpp gui/Button/Button.h gui/MainMenu/MainMenu.cpp gui/MainMenu/MainMenu.h gui/Window/Window.cpp gui/Window/Window.h gui/SingleGame/SingleGame.cpp gui/SingleGame/SingleGame.h)
+        gui/Button/Button.cpp gui/Button/Button.h gui/MainMenu/MainMenu.cpp gui/MainMenu/MainMenu.h gui/Window/Window.cpp gui/Window/Window.h gui/SingleGame/SingleGame.cpp gui/SingleGame/SingleGame.h engine/entities/Booster/Booster.h engine/entities/Booster/Booster.cpp)
 
 target_link_libraries(TankMaster sfml-graphics sfml-audio)
