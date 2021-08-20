@@ -1,8 +1,8 @@
 #pragma once
-#include "../../engine/entities/Tank/Tank.h"
-#include "../../engine/Game/Game.h"
-#include "../../gui/constants.h"
-#include "../../util/Loader/Loader.h"
+#include "../engine/entities/Tank/Tank.h"
+#include "../engine/Game/Game.h"
+#include "../gui/constants.h"
+#include "../util/Loader/Loader.h"
 
 class TcpGameHost {
 public:
@@ -19,6 +19,9 @@ private:
         sf::TcpSocket &socket;
     };
 
+    void add_new_player(sf::TcpSocket &socket);
+    void update_game(float delta_time);
+    void send_game();
     void wait_players();
     void receive();
 

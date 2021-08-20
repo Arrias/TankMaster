@@ -1,12 +1,7 @@
-//
-// Created by arrias on 08.08.2021.
-//
-
 #include "Registry.h"
-#include "../constants.h"
 #include "../../registry/API/RegistryApi.h"
-#include "../Button/Button.h"
 #include "consts.h"
+#include "../TcpMultiplayerGame/TcpMultiplayerGame.h"
 #include <iostream>
 
 Registry::Registry(Window base) : Window(base) {}
@@ -21,7 +16,7 @@ void Registry::draw_rooms(sf::RenderWindow &window, const std::vector<Room> &roo
         return text;
     };
 
-    std::vector<Button> buttons;
+    buttons.clear();
     Vector but_size = Vector(500, 250);
     int id = 0;
 
@@ -30,9 +25,14 @@ void Registry::draw_rooms(sf::RenderWindow &window, const std::vector<Room> &roo
 
     for (auto &room : rooms) {
         ++id;
-        buttons.push_back(Button(Block(Vector(REGISTRY::WIDTH / 2, 250 * id), but_size, 0, 0),
+        buttons.emplace_back(Block(Vector(REGISTRY::WIDTH / 2, 250 * id), but_size, 0, 0),
                                  button_texture, active_button_texture,
-                                 get_button_with_text(room.creator_name.value + " " + room.address.value.getAddress())));
+                                 get_button_with_text(room.creator_name.value + " " + room.address.value.getAddress()));
+
+        buttons.back().setCallback([&room, &window, this]() {
+            window.close();
+            pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
+        });
     }
 
     for (auto &but : buttons) {
@@ -54,6 +54,15 @@ void Registry::show() {
     float load_delay = 5 * 1000;
 
     active([ ](sf::Event e) {}, [&clock, &load_delay, &api, &window, this]() {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            auto mouseX = sf::Mouse::getPosition(window).x;
+            auto mouseY = sf::Mouse::getPosition(window).y;
+            for (auto &button : buttons) {
+                if (point_in_block(Vector(mouseX, mouseY), &button)) {
+                    button.click();
+                }
+            }
+        }
         if (clock.getElapsedTime().asMilliseconds() >= load_delay) {
             clock.restart();
             api.get_rooms();

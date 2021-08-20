@@ -72,6 +72,8 @@ void TcpMultiplayerGame::show() {
     sf::Clock clock;
     bool connected = false;
 
+    window.clear(sf::Color(0, 0, 0));
+
     active([&t, this](sf::Event event) {
         t.update(event);
         sf::Packet packet;

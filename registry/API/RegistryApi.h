@@ -1,18 +1,15 @@
-//
-// Created by arrias on 09.08.2021.
-//
 #include "SFML/Network.hpp"
 #include "../Room/Room.h"
-#include "../../util/IpAddress/IpAddress.h"
+#include "../../util/Address/Address.h"
 
 #pragma once
 
 class RegistryApi {
-    IpAddress registry_ip;
+    Address registry_ip;
     sf::Http http;
 
 public:
-    RegistryApi(IpAddress registry_ip);
+    RegistryApi(Address registry_ip);
     bool create_room(const Room &room);
     std::vector<Room> get_rooms();
 

@@ -370,3 +370,7 @@ Game::Game(Map map) : map(std::move(map)), id(map.get_new_id()) {}
 int Game::get_new_id() const {
     return id;
 }
+
+const Map Game::get_map() const {
+    return map;
+}

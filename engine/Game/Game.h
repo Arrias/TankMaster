@@ -37,6 +37,8 @@ public:
 
     const vector<shared_ptr<Bullet>> get_bullets() const;
 
+    const Map get_map() const;
+
     void move_bullets(float lambda);
 
     void move_movable_object(MovableBlock *block_to_move, float dist, Vector dir);

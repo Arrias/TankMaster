@@ -1,9 +1,6 @@
-//
-// Created by arrias on 08.08.2021.
-//
 #include "../../rapidjson/prettywriter.h"
 #include "../../rapidjson/document.h"
-#include "../../util/IpAddress/IpAddress.h"
+#include "../../util/Address/Address.h"
 #include "../../util/InitializeValue/InitializeValue.h"
 
 #pragma once
@@ -14,7 +11,7 @@ struct Room {
     InitializeValue<string> creator_name;
     InitializeValue<int> places_cnt;
     InitializeValue<int> free_places;
-    InitializeValue<IpAddress> address;
+    InitializeValue<Address> address;
 
     void serialize(PrettyWriter<StringBuffer> &pw) const {
         pw.StartObject();
@@ -28,7 +25,6 @@ struct Room {
         address.value.serialize(pw);
         pw.EndObject();
     }
-
     template<class T>
     bool deserialize_from_document(T &document) {
         for (auto it = document.MemberBegin(); it != document.MemberEnd(); ++it) {

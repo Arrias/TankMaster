@@ -5,7 +5,7 @@
 #include "RegistryApi.h"
 #include <iostream>
 
-RegistryApi::RegistryApi(IpAddress registry_ip) : registry_ip(registry_ip) {
+RegistryApi::RegistryApi(Address registry_ip) : registry_ip(registry_ip) {
     if (registry_ip.port.empty()) {
         http.setHost(registry_ip.host);
     } else {

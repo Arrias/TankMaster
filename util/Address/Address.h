@@ -10,14 +10,14 @@ using rapidjson::PrettyWriter;
 using rapidjson::StringBuffer;
 using rapidjson::Document;
 
-struct IpAddress {
+struct Address {
     std::string host, port;
 
-    IpAddress() {}
+    Address() {}
 
-    IpAddress(std::string host, std::string port) : host(host), port(port) {}
+    Address(std::string host, std::string port) : host(host), port(port) {}
 
-    bool operator==(const IpAddress &oth) const {
+    bool operator==(const Address &oth) const {
         return host == oth.host && port == oth.port;
     }
 

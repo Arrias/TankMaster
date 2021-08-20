@@ -6,7 +6,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "../../util/Loader/Loader.h"
-#include "../../util/IpAddress/IpAddress.h"
+#include "../../util/Address/Address.h"
+#include "../../TcpGameHost/TcpGameHost.h"
 #include <memory>
 
 using std::shared_ptr;
@@ -14,10 +15,11 @@ using std::vector;
 
 struct Window {
     struct Parameters {
+        vector<shared_ptr<TcpGameHost>> *games;
         vector<shared_ptr<Window>> *nav;
         Loader<sf::Texture> *texture_loader;
         Loader<sf::Font> *font_loader;
-        IpAddress registry_ip;
+        Address registry_ip;
     };
 
     Parameters pars;

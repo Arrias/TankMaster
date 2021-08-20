@@ -46,8 +46,6 @@ void MainMenu::show() {
     RenderWindow window(VideoMode(MAIN_MENU::WIDTH, MAIN_MENU::HEIGHT), GAME_CONSTS::NAME, sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(FPS_LIMIT);
 
-    // buttons = {single game, multiplayer game, add room, all rooms, exit}
-
     auto &single_game_button = buttons[0];
     auto &add_room_button = buttons[1];
     auto &join_room_button = buttons[2];
@@ -58,15 +56,18 @@ void MainMenu::show() {
         pars.nav->push_back(shared_ptr<Window>(new SingleGame(Window(pars))));
     });
 
-    add_room_button.setCallback([&window, this] {
-        RegistryApi api(pars.registry_ip);
+    add_room_button.setCallback([&window, this]() {
+        unsigned short port = 2009;
         Room room;
         room.creator_name = "Player";
-        room.address = {"http://localhost", "2010"};
+        room.address = {"http://localhost", std::to_string(port)};
         room.free_places = 1;
         room.places_cnt = 1;
 
+        RegistryApi api(pars.registry_ip);
         if(api.create_room(room)) {
+            pars.games->push_back(std::make_shared<TcpGameHost>(port));
+            pars.games->back()->launch();
             window.close();
             pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
         }
