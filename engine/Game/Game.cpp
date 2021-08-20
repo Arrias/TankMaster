@@ -323,7 +323,8 @@ void Game::shoot(Tank *tank, float bullet_strength) {
         if (!IS_HIT) {
             bool IN_BLOCK = false;
             for (auto block : blocks) {
-                if (get_blocks_intersection(bullet.get(), block.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS) {
+                if (get_blocks_intersection(bullet.get(), block.get()).type == INTERSECTION_TYPE::HAVE_INTERSECTIONS
+                || point_in_block(get_block_points(bullet.get())[0],block.get())) {
                     IN_BLOCK = true;
                     break;
                 }

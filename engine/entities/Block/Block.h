@@ -30,6 +30,8 @@ public:
 
 std::vector<Vector> get_block_points(Block *a);
 
+bool point_in_block(Vector point, Block *block);
+
 Intersection get_blocks_intersection(Block *a, Block *b);
 
 std::vector<Segment> get_bad_segments(Block *a, Block *b);

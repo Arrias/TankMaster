@@ -4,6 +4,7 @@
 #include "../entities/Tank/Tank.h"
 #include "../entities/Bullet/Bullet.h"
 #include "../entities/Booster/Booster.h"
+#include "../entities/Block/Block.h"
 #include <memory>
 
 using std::shared_ptr;
