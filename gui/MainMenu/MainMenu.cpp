@@ -1,9 +1,4 @@
-//
-// Created by arrias on 31.07.2021.
-//
-
 #include "MainMenu.h"
-#include "../constants.h"
 #include <string>
 #include "../Button/Button.h"
 #include "../SingleGame/SingleGame.h"
@@ -12,6 +7,7 @@
 #include "../TcpMultiplayerGame/TcpMultiplayerGame.h"
 #include "../../registry/API/RegistryApi.h"
 
+using std::pair;
 using std::vector;
 using std::string;
 using sf::RenderWindow;
@@ -59,16 +55,17 @@ void MainMenu::show() {
     add_room_button.setCallback([&window, this]() {
         unsigned short port = 2009;
         Room room;
+        Room::Identifier id;
         room.creator_name = "Player";
         room.address = {"http://localhost", std::to_string(port)};
-        room.free_places = 1;
-        room.places_cnt = 1;
+        room.places_cnt = 2;
+        room.free_places = 2;
 
         RegistryApi api(pars.registry_ip);
-        if(api.create_room(room)) {
-            pars.games->push_back(std::make_shared<TcpGameHost>(port));
-            pars.games->back()->launch();
+        if(api.create_room(room, id)) {
             window.close();
+            pars.games->push_back(std::make_shared<TcpGameHost>(room, id, pars.registry_ip));
+            pars.games->back()->launch();
             pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
         }
     });

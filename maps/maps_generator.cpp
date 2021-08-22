@@ -5,6 +5,7 @@
 #include "../rapidjson/document.h"
 #include "../util/geometry/Vector/Vector.h"
 #include "Map.h"
+#include "../registry/API/RegistryApi.h"
 
 using rapidjson::FileWriteStream;
 
@@ -21,6 +22,11 @@ void write_map_to_file(FILE* file, Map map) {
 }
 
 int main() {
+    sf::Http http;
+    http.setHost("http://localhost", 8081);
+    sf::Http::Request request("/health", sf::Http::Request::Get);
+    auto response = http.sendRequest(request);
+
     StringBuffer  sb;
     PrettyWriter<StringBuffer> pw(sb);
     Map map;

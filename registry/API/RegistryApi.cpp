@@ -1,7 +1,3 @@
-//
-// Created by arrias on 09.08.2021.
-//
-
 #include "RegistryApi.h"
 #include <iostream>
 
@@ -27,14 +23,33 @@ std::vector<Room> deserialize(std::string json) {
     return ret;
 }
 
-bool RegistryApi::create_room(const Room &room) {
+bool RegistryApi::create_room(const Room &room, Room::Identifier &id) {
     rapidjson::StringBuffer sb;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
     room.serialize(writer);
-    sf::Http::Request request("/rooms/create", sf::Http::Request::Post);
+    sf::Http::Request request("/rooms", sf::Http::Request::Post);
     request.setBody(sb.GetString());
     auto response = http.sendRequest(request);
+    id.deserialize_from_json(response.getBody());
     return (response.getStatus() == sf::Http::Response::Created);
+}
+
+bool RegistryApi::edit_room(const Room &room, const Room::Identifier &id) {
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+
+    writer.StartObject();
+    writer.Key("id");
+    id.serialize(writer);
+    writer.Key("room");
+    room.serialize(writer);
+    writer.EndObject();
+
+    sf::Http::Request request("/rooms", sf::Http::Request::Put);
+    request.setBody(sb.GetString());
+    auto response = http.sendRequest(request);
+
+    return (response.getStatus() == sf::Http::Response::Ok);
 }
 
 std::vector<Room> RegistryApi::get_rooms() {

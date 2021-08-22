@@ -10,9 +10,9 @@ void sample_game_init(Game &game) {
     game = temp;
 }
 
-TcpGameHost::TcpGameHost(int port) : game({}) {
+TcpGameHost::TcpGameHost(Room room, RoomId id, Address registry_ip) : game({}), room(room), id(id), registry_ip(registry_ip) {
     sample_game_init(game);
-    listener.listen(port);
+    listener.listen(stoi(room.address.value.port));
     selector.add(listener);
 }
 
@@ -29,9 +29,15 @@ void TcpGameHost::add_new_player(sf::TcpSocket &socket) {
     game.add_tank(std::make_shared<Tank>(MovableBlock(
             Block(spawn_point, Vector(TANK_CONSTS::WIDTH, TANK_CONSTS::HEIGHT), player_id,
                   0), Vector(0, 1), TANK_CONSTS::BASE::SPEED, TANK_CONSTS::BASE::ROTATION), 100.0));
+
     mutex.lock();
     players.emplace_back(player_id, socket);
     mutex.unlock();
+
+    room.free_places.value--;
+
+    RegistryApi api(registry_ip);
+    api.edit_room(room, id);
 }
 
 void TcpGameHost::send_game() {
@@ -97,8 +103,7 @@ void TcpGameHost::launch()  {
 }
 
 void TcpGameHost::wait_players() {
-    /* вместо 2 тут должно быть требуемое количество игроков в комнате */
-    while (players.size() < 2 && selector.wait()) {
+    while (room.free_places.value && selector.wait()) {
         if (selector.isReady(listener)) {
             auto socket = new sf::TcpSocket;
             if (listener.accept(*socket) == sf::Socket::Status::Done) {

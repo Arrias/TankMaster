@@ -40,7 +40,6 @@ add_executable(registry_server registry/server.cpp
         util/geometry/general_functions/general_functions.cpp
         util/geometry/Segment/Segment.cpp
         util/geometry/Line/Line.cpp
-        TcpGameHost/TcpGameHost.cpp
         maps/Map.cpp)
 target_link_libraries(registry_server ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(registry_server sfml-graphics sfml-audio sfml-network)

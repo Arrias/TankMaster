@@ -9,8 +9,9 @@ class RegistryApi {
     sf::Http http;
 
 public:
-    RegistryApi(Address registry_ip);
-    bool create_room(const Room &room);
+    explicit RegistryApi(Address registry_ip);
+    bool create_room(const Room &room, Room::Identifier &id);
+    bool edit_room(const Room &room, const Room::Identifier &id);
     std::vector<Room> get_rooms();
 
     std::vector<Room> rooms;

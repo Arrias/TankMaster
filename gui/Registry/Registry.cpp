@@ -17,22 +17,26 @@ void Registry::draw_rooms(sf::RenderWindow &window, const std::vector<Room> &roo
     };
 
     buttons.clear();
-    Vector but_size = Vector(500, 250);
-    int id = 0;
+    Vector but_size = Vector(700, 100);
+    Vector cords = Vector(360, 60 );
 
     auto button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 1));
     auto active_button_texture = pars.texture_loader->load_item(Loader<sf::Texture>::get_path_to_texture("buttons", 2));
 
     for (auto &room : rooms) {
-        ++id;
-        buttons.emplace_back(Block(Vector(REGISTRY::WIDTH / 2, 250 * id), but_size, 0, 0),
+        buttons.emplace_back(Block(cords, but_size, 0, 0),
                                  button_texture, active_button_texture,
-                                 get_button_with_text(room.creator_name.value + " " + room.address.value.getAddress()));
+                                 get_button_with_text(room.creator_name.value + " " +
+                                 room.address.value.getAddress() + " " +
+                                 std::to_string(room.free_places.value) + "/" +
+                                 std::to_string(room.places_cnt.value) +
+                                 " free places"));
 
         buttons.back().setCallback([&room, &window, this]() {
             window.close();
             pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
         });
+        cords.y += but_size.y + 10;
     }
 
     for (auto &but : buttons) {
