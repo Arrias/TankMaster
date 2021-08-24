@@ -1,9 +1,8 @@
-#include "TcpMultiplayerGame.h"
+#include "UdpMultiplayerGame.h"
 #include "../../gui/GameDrawer/GameDrawer.h"
 #include <SFML/Network.hpp>
 #include "consts.h"
 #include <chrono>
-#include <utility>
 #include <iostream>
 
 const size_t floor_type = 3;
@@ -58,12 +57,14 @@ struct TankController1 {
     }
 };
 
-bool TcpMultiplayerGame::reg() {
-    return (socket.connect(room.address.value.host, stoi(room.address.value.port)) ==
-            sf::Socket::Status::Done);
+bool UdpMultiplayerGame::reg() {
+    sf::Packet packet;
+    packet << "registry!";
+    socket.send(packet, room.address.value.host, stoi(room.address.value.port));
+    return true;
 }
 
-void TcpMultiplayerGame::show() {
+void UdpMultiplayerGame::show() {
     sf::RenderWindow window(sf::VideoMode(MULTIPLAYER_GAME::WIDTH, MULTIPLAYER_GAME::HEIGHT), GAME_CONSTS::NAME);
     window.setFramerateLimit(FPS_LIMIT);
     window.setKeyRepeatEnabled(false);
@@ -71,42 +72,46 @@ void TcpMultiplayerGame::show() {
     Game game({});
     GameDrawer game_drawer(floor_type, pars.texture_loader);
 
-    TankController1 t(sf::Keyboard::Left, sf::Keyboard::Right, sf::Keyboard::Up,sf::Keyboard::Down, sf::Keyboard::G);
+    TankController1 t(sf::Keyboard::Left, sf::Keyboard::Right, sf::Keyboard::Up, sf::Keyboard::Down, sf::Keyboard::G);
 
     sf::Clock clock;
     bool connected = false;
-
-    window.clear(sf::Color(0, 0, 0));
 
     active([&t, this](sf::Event event) {
         t.update(event);
         sf::Packet packet;
         packet << t.shoot << t.moveRight << t.moveLeft << t.moveDown << t.moveUp;
-        socket.send(packet);
+        socket.send(packet, room.address.value.host, stoi(room.address.value.port));
         t.shoot = false;
     }, [&clock, &window, &game_drawer, &game, &connected, this]() {
         if (clock.getElapsedTime().asMilliseconds() < 1000 / FPS_LIMIT) return;
         if(!connected) {
             connected = reg();
-            if(connected) socket.setBlocking(false);
         }
         else {
             sf::Packet packet;
-            if (socket.receive(packet) == sf::Socket::Status::Done) {
-                packet >> game;
+            sf::IpAddress addr;
+            unsigned short port;
 
-                for (auto &i : game.get_blocks())
-                    game_drawer.set_texture_num(i->get_id(), 1);
-                for (auto &i : game.get_tanks())
-                    game_drawer.set_texture_num(i->get_id(), 2);
-
-                window.clear(sf::Color(0, 0, 0));
-                game_drawer.draw_game(game, window);
-                window.display();
+            if (socket.receive(packet, addr, port) == sf::Socket::Status::Done) {
+                if (addr == sf::IpAddress(room.address.value.host) && port == stoi(room.address.value.port)) {
+                    packet >> game;
+                }
             }
+
+            for (auto &i : game.get_blocks())
+                game_drawer.set_texture_num(i->get_id(), 1);
+            for (auto &i : game.get_tanks())
+                game_drawer.set_texture_num(i->get_id(), 2);
+
+            window.clear(sf::Color(0, 0, 0));
+            game_drawer.draw_game(game, window);
+            window.display();
         }
         clock.restart();
     }, window);
 }
 
-TcpMultiplayerGame::TcpMultiplayerGame(Room room, Window base) : room(std::move(room)), Window(base) {}
+UdpMultiplayerGame::UdpMultiplayerGame(Room room, Window base) : room(std::move(room)), Window(base) {
+    socket.setBlocking(false);
+}

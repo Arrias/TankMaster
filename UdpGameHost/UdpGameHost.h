@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include "../engine/entities/Tank/Tank.h"
 #include "../engine/Game/Game.h"
 #include "../gui/constants.h"
@@ -8,25 +9,31 @@
 
 typedef Room::Identifier RoomId;
 
-class TcpGameHost {
+class UdpGameHost {
 public:
-    explicit TcpGameHost(Room room, RoomId id, Address registry_ip);
-    ~TcpGameHost();
+    UdpGameHost(Room room, RoomId id, Address registry_ip);
+    ~UdpGameHost();
     void launch();
-    void add_new_player(sf::TcpSocket &socket);
+    void add_new_player(Address addr);
 
 private:
     class Player {
     public:
-        Player(int id, sf::TcpSocket &socket) : id(id), socket(socket) {}
+        Player(int id, Address addr) : id(id), addr(addr) {}
         bool shoot = false, moveForward = false, moveRight = false, moveLeft = false, moveBack = false;
         int id;
-        sf::TcpSocket &socket;
+        Address addr;
+
+        struct Comparator {
+            bool operator()(const Player& a, const Player& b) const {
+                return a.addr.getAddress() < b.addr.getAddress();
+            }
+        };
     };
 
     void sample_game_init(Game &game);
-    void update_game(float delta_time);
     void send_game();
+    void update_game(float delta_time);
     void wait_players();
     void receive();
 
@@ -34,10 +41,8 @@ private:
     RoomId id;
     Game game;
     Address registry_ip;
-    sf::TcpListener listener;
-    std::vector<Player> players;
-    sf::SocketSelector selector;
+    sf::UdpSocket listener;
     std::shared_ptr<sf::Thread> game_thread;
-    sf::Mutex mutex;
+    std::set<Player, Player::Comparator> players;
+    //sf::Mutex mutex;
 };
-

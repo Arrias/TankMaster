@@ -3,16 +3,15 @@
 #include "../Window/Window.h"
 #include <SFML/Network.hpp>
 #include "../constants.h"
-#include "../../registry/Room/Room.h"
 
-struct TcpMultiplayerGame : public Window {
-    explicit TcpMultiplayerGame(Room room, Window base);
+struct UdpMultiplayerGame : public Window {
+    explicit UdpMultiplayerGame(Room room, Window base);
 
     void show() override;
 
 private:
     bool reg();
-    sf::TcpSocket socket;
+    sf::UdpSocket socket;
     Room room;
 };
 

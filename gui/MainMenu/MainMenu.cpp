@@ -6,6 +6,8 @@
 #include "consts.h"
 #include "../TcpMultiplayerGame/TcpMultiplayerGame.h"
 #include "../../registry/API/RegistryApi.h"
+#include "../../UdpGameHost/UdpGameHost.h"
+#include "../UdpMultiplayerGame/UdpMultiplayerGame.h"
 
 using std::pair;
 using std::vector;
@@ -57,16 +59,16 @@ void MainMenu::show() {
         Room room;
         Room::Identifier id;
         room.creator_name = "Player";
-        room.address = {"http://localhost", std::to_string(port)};
+        room.address = {"127.0.0.1", std::to_string(port)};
         room.places_cnt = 2;
         room.free_places = 2;
 
         RegistryApi api(pars.registry_ip);
         if(api.create_room(room, id)) {
             window.close();
-            pars.games->push_back(std::make_shared<TcpGameHost>(room, id, pars.registry_ip));
+            pars.games->push_back(std::make_shared<UdpGameHost>(room, id, pars.registry_ip));
             pars.games->back()->launch();
-            pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
+            pars.nav->push_back(shared_ptr<Window>(new UdpMultiplayerGame(room, Window(pars))));
         }
     });
 

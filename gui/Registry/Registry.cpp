@@ -2,6 +2,7 @@
 #include "../../registry/API/RegistryApi.h"
 #include "consts.h"
 #include "../TcpMultiplayerGame/TcpMultiplayerGame.h"
+#include "../UdpMultiplayerGame/UdpMultiplayerGame.h"
 #include <iostream>
 
 Registry::Registry(Window base) : Window(base) {}
@@ -34,7 +35,7 @@ void Registry::draw_rooms(sf::RenderWindow &window, const std::vector<Room> &roo
 
         buttons.back().setCallback([&room, &window, this]() {
             window.close();
-            pars.nav->push_back(shared_ptr<Window>(new TcpMultiplayerGame(room, Window(pars))));
+            pars.nav->push_back(shared_ptr<Window>(new UdpMultiplayerGame(room, Window(pars))));
         });
         cords.y += but_size.y + 10;
     }

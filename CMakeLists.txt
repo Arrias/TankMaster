@@ -23,7 +23,9 @@ add_executable(TankMasterClient main/TankMasterClient.cpp
         gui/Window/Window.cpp
         gui/SingleGame/SingleGame.cpp
         gui/TcpMultiplayerGame/TcpMultiplayerGame.cpp
+        gui/UdpMultiplayerGame/UdpMultiplayerGame.cpp
         TcpGameHost/TcpGameHost.cpp
+        UdpGameHost/UdpGameHost.cpp
         maps/Map.cpp)
 
 target_link_libraries(TankMasterClient sfml-graphics sfml-audio sfml-network)

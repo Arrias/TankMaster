@@ -1,9 +1,10 @@
 #include "../gui/SingleGame/SingleGame.h"
 #include "../gui/MainMenu/MainMenu.h"
+#include "../UdpGameHost/UdpGameHost.h"
 
 int main(int argc, char *argv[]) {
     // Initialize parameters
-    std::vector<shared_ptr<TcpGameHost>> my_games;
+    std::vector<shared_ptr<UdpGameHost>> my_games;
     Loader<sf::Texture> texture_loader;
     Loader<sf::Font> font_loader;
     std::vector<shared_ptr<Window>> nav;
